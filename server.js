@@ -63,7 +63,7 @@ function serveFile(filePath, res) {
 function handleStatic(p, res) {
   if (p === "/" || p === "") return serveFile(path.join(DIR, "public", "index.html"), res);
   if (p === "/admin" || p === "/admin/") return serveFile(path.join(DIR, "admin", "index.html"), res);
-  if (p.startsWith("/uploads/")) return serveFile(path.join(DIR, p), res);
+  if (p.startsWith("/uploads/")) return serveFile(path.join(UPLOAD_DIR, p.replace("/uploads/", "")), res);
   if (p.startsWith("/admin/")) return serveFile(path.join(DIR, p), res);
   serveFile(path.join(DIR, "public", p), res);
 }
