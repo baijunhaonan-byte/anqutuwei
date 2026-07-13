@@ -476,7 +476,7 @@ async function handleAPI(req, res) {
   // ================== 静态密钥验证 ==================
   if (u.pathname === "/api/auth/verify-static-key" && method === "POST") {
     var body = await parseJSON(req);
-    if (!body || !body.staticKey || !body.userId) {
+    if (!body || !body.static_key || !body.userId) {
       return json({ error: "参数不完整" }, 400);
     }
     if (body.staticKey !== STATIC_KEY) {
