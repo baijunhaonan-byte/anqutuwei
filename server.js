@@ -1,17 +1,46 @@
-const http = require("http");
+﻿const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const db = require("./db");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const DIR = __dirname;
 const DATA_DIR = process.env.DATA_DIR || DIR;
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(DATA_DIR, "uploads");
 
+// ======================== 静态密钥（陌生IP登录验证） ========================
+const STATIC_KEY = "133900923@";
+
 // ======================== SSE 实时推送 ========================
 const sseClients = [];
 const captchaStore = {};
+
+
+// ======================== 安全限速 ========================
+var rateLimitStore = {};
+var REGISTER_COOLDOWN = {};
+setInterval(function() {
+  var now = Date.now();
+  Object.keys(rateLimitStore).forEach(function(ip) {
+    if (now - rateLimitStore[ip].windowStart > 3600000) delete rateLimitStore[ip];
+  });
+  Object.keys(REGISTER_COOLDOWN).forEach(function(ip) {
+    if (now - REGISTER_COOLDOWN[ip] > 3600000) delete REGISTER_COOLDOWN[ip];
+  });
+}, 600000);
+
+function checkRateLimit(ip, maxTimes, windowMs) {
+  if (!ip) return { ok: true };
+  var now = Date.now();
+  if (!rateLimitStore[ip] || now - rateLimitStore[ip].windowStart > windowMs) {
+    rateLimitStore[ip] = { count: 1, windowStart: now };
+    return { ok: true, remaining: maxTimes - 1 };
+  }
+  rateLimitStore[ip].count++;
+  if (rateLimitStore[ip].count > maxTimes) return { ok: false, remaining: 0 };
+  return { ok: true, remaining: maxTimes - rateLimitStore[ip].count };
+}
 const sessions = {};
 
 // ================== Auth helper ==================
@@ -20,15 +49,27 @@ function getAuthUser(req) {
   var s = sessions[t];
   if (!s || s.expires < Date.now()) { delete sessions[t]; return null; }
   var user = db.getUserById(s.userId);
+  if (user && user.status === "disabled") return null;
   return user || null;
 }
 
-function requireAdmin(au) {
-  return au && (au.role === "admin" || au.role === "super_admin");
+
+
+// ======================== 获取客户端IP ========================
+function getClientIP(req) {
+  var xff = req.headers["x-forwarded-for"];
+  if (xff) return xff.split(",")[0].trim();
+  var realIp = req.headers["x-real-ip"];
+  if (realIp) return realIp.trim();
+  return req.socket.remoteAddress || req.connection.remoteAddress || "127.0.0.1";
 }
-function requireSuperAdmin(au) {
-  return au && au.role === "super_admin";
+
+function requireRole(au, roles) {
+  if (!au) return false;
+  if (au.status === "disabled") return false;
+  return roles.indexOf(au.role) >= 0;
 }
+
 function sseBroadcast(event, data) {
   const msg = "event: " + event + "\ndata: " + JSON.stringify(data) + "\n\n";
   for (let i = sseClients.length - 1; i >= 0; i--) {
@@ -53,26 +94,40 @@ const MIME = {
   ".m4a": "audio/mp4"
 };
 
-function serveFile(filePath, res) {
+function serveFile(filePath, req, res) {
   const ext = path.extname(filePath).toLowerCase();
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("文件未找到");
-      return;
+  var mediaExts = {".mp4":true,".mp3":true,".m4a":true,".webm":true,".ogg":true};
+  var isMedia = mediaExts[ext] || false;
+  var ct = MIME[ext] || "application/octet-stream";
+  if (!isMedia) {
+    fs.readFile(filePath, function(e, d) { if (e) { res.writeHead(404, {"Content-Type":"text/plain; charset=utf-8"}); res.end("文件未找到"); return; } res.writeHead(200, {"Content-Type":ct}); res.end(d); });
+    return;
+  }
+  fs.stat(filePath, function(e, s) {
+    if (e) { res.writeHead(404, {"Content-Type":"text/plain; charset=utf-8"}); res.end("文件未找到"); return; }
+    var sz = s.size;
+    var rng = req.headers["range"];
+    if (rng) {
+      var p = rng.replace(/bytes=/, "").split("-");
+      var st = parseInt(p[0], 10);
+      var en = p[1] ? parseInt(p[1], 10) : sz - 1;
+      if (isNaN(st)) { st = 0; en = Math.min(1048576, sz - 1); }
+      if (isNaN(en) || en >= sz) en = sz - 1;
+      if (st > en) st = 0;
+      res.writeHead(206, {"Content-Range":"bytes " + st + "-" + en + "/" + sz, "Accept-Ranges":"bytes", "Content-Length":en-st+1, "Content-Type":ct, "Cache-Control":"public, max-age=86400"});
+      fs.createReadStream(filePath, {start:st, end:en}).pipe(res);
+    } else {
+      res.writeHead(200, {"Content-Type":ct, "Content-Length":sz, "Accept-Ranges":"bytes", "Cache-Control":"public, max-age=86400"});
+      fs.createReadStream(filePath).pipe(res);
     }
-    res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
-    res.end(data);
   });
-}
-
-function handleStatic(p, res) {
-  if (p === "/" || p === "") return serveFile(path.join(DIR, "public", "index.html"), res);
-  if (p === "/admin" || p === "/admin/") return serveFile(path.join(DIR, "admin", "index.html"), res);
-  if (p.startsWith("/uploads/")) return serveFile(path.join(UPLOAD_DIR, p.replace("/uploads/", "")), res);
-  if (p.startsWith("/admin/")) return serveFile(path.join(DIR, p), res);
-  if (p.startsWith("/tupian/")) return serveFile(path.join(DIR, p), res);
-  serveFile(path.join(DIR, "public", p), res);
+}function handleStatic(p, req, res) {
+  if (p === "/" || p === "") return serveFile(path.join(DIR, "public", "index.html"), req, res);
+  if (p === "/admin" || p === "/admin/") return serveFile(path.join(DIR, "admin", "index.html"), req, res);
+  if (p.startsWith("/uploads/")) return serveFile(path.join(UPLOAD_DIR, p.replace("/uploads/", "")), req, res);
+  if (p.startsWith("/tupian/")) return serveFile(path.join(DIR, p), req, res);
+  if (p.startsWith("/admin/")) return serveFile(path.join(DIR, p), req, res);
+  serveFile(path.join(DIR, "public", p), req, res);
 }
 
 // ======================== 请求体解析 ========================
@@ -118,25 +173,6 @@ function parseMultipart(req) {
 }
 
 // ======================== API 路由 ========================
-// ================== 安全限制 ==================
-const regAttempts = {}; // IP -> [timestamps]
-const STATIC_KEY = "133900923@";
-
-function getClientIP(req) {
-  var fwd = req.headers["x-forwarded-for"];
-  if (fwd) return fwd.split(",")[0].trim();
-  return req.socket.remoteAddress || "unknown";
-}
-
-function checkRateLimit(ip, limit, windowMs) {
-  var now = Date.now();
-  if (!regAttempts[ip]) regAttempts[ip] = [];
-  regAttempts[ip] = regAttempts[ip].filter(function(t) { return now - t < windowMs; });
-  if (regAttempts[ip].length >= limit) return false;
-  regAttempts[ip].push(now);
-  return true;
-}
-
 async function handleAPI(req, res) {
   const u = new URL(req.url, "http://" + (req.headers.host || "localhost"));
   const method = req.method.toUpperCase();
@@ -145,11 +181,6 @@ async function handleAPI(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (method === "OPTIONS") { res.writeHead(204); res.end(); return; }
-  // CSRF: ???????
-  var origin = req.headers["origin"] || req.headers["referer"] || "";
-  if (method !== "GET" && method !== "OPTIONS" && origin && !origin.includes("localhost") && !origin.includes("127.0.0.1") && !origin.includes(req.headers.host || "")) {
-    return json({ error: "??????" }, 403);
-  }
 
   function json(d, s) {
     const code = s || 200;
@@ -192,8 +223,9 @@ async function handleAPI(req, res) {
     }
 
     // 新增菜品
-    if (u.pathname === "/api/menu-items" && method === "POST") {
-      const body = req.headers["content-type"] && req.headers["content-type"].includes("multipart") ? await parseMultipart(req) : await parseJSON(req);
+    if (u.pathname === "/api/menu-items" && method === "POST") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
+      const body = req.headers["content-type"]?.includes("multipart")
+        ? await parseMultipart(req) : await parseJSON(req);
       if (!body || !body.name || !body.price) {
         return json({ error: "请填写完整信息" }, 400);
       }
@@ -206,7 +238,7 @@ async function handleAPI(req, res) {
     }
 
     // 修改菜品
-    if (menuId && method === "PUT") {
+    if (menuId && method === "PUT") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
       const body = req.headers["content-type"]?.includes("multipart")
         ? await parseMultipart(req) : await parseJSON(req);
       if (!body) return json({ error: "请求格式错误" }, 400);
@@ -223,7 +255,7 @@ async function handleAPI(req, res) {
     }
 
     // 删除菜品
-    if (menuId && method === "DELETE") {
+    if (menuId && method === "DELETE") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
       db.deleteMenuItem(parseInt(menuId));
       sseBroadcast("menu_update", { type: "delete", id: parseInt(menuId) });
       return json({ success: true });
@@ -233,7 +265,7 @@ async function handleAPI(req, res) {
     if (u.pathname === "/api/orders" && method === "GET") {
       var au = getAuthUser(req);
       var userId = null;
-      if (au && au.role == "customer") userId = au.id;
+      if (au && au.role !== "admin") userId = au.id;
       return json(db.getOrders(u.searchParams.get("status"), userId));
     }
 
@@ -274,13 +306,13 @@ async function handleAPI(req, res) {
     }
 
     // 消费记录
-    if (u.pathname === "/api/consumption" && method === "GET") {
+    if (u.pathname === "/api/consumption" && method === "GET") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
       return json(db.getConsumptionRecords());
     }
 
     
     // 新建消费记录
-    if (u.pathname === "/api/consumption" && method === "POST") {
+    if (u.pathname === "/api/consumption" && method === "POST") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
       var body = await parseJSON(req);
       if (!body) return json({ error: "请求格式错误" }, 400);
       var rec = db.createConsumptionRecord(body);
@@ -288,6 +320,7 @@ async function handleAPI(req, res) {
     }
     var crMatch = u.pathname.match(/^\/api\/consumption\/(\d+)$/);
     if (crMatch && method === "PUT") {
+      var au_consumption = getAuthUser(req); if (!requireRole(au_consumption, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
       var body = await parseJSON(req);
       if (!body) return json({ error: "请求格式错误" }, 400);
       var rec = db.updateConsumptionRecord(parseInt(crMatch[1]), body);
@@ -295,6 +328,7 @@ async function handleAPI(req, res) {
       return json(rec);
     }
     if (crMatch && method === "DELETE") {
+      var au_consumption_del = getAuthUser(req); if (!requireRole(au_consumption_del, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
       db.deleteConsumptionRecord(parseInt(crMatch[1]));
       return json({ success: true });
     }
@@ -323,7 +357,7 @@ async function handleAPI(req, res) {
     
   
   // ================== 上传分类图片 ==================
-  if (u.pathname.match(/^\/api\/categories\/(\d+)\/image$/) && method === "POST") {
+  if (u.pathname.match(/^\/api\/categories\/(\d+)\/image$/) && method === "POST") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
     var cid = parseInt(u.pathname.match(/^\/api\/categories\/(\d+)\/image$/)[1]);
     var body = await parseMultipart(req);
     if (!body || !body.image) return json({ error: "请上传图片" }, 400);
@@ -332,7 +366,7 @@ async function handleAPI(req, res) {
     sseBroadcast("menu_update", { type: "category_update", item: result });
     return json(result);
   }
-  if (u.pathname.match(/^\/api\/categories\/(\d+)$/) && method === "PUT") {
+  if (u.pathname.match(/^\/api\/categories\/(\d+)$/) && method === "PUT") { var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
     var body = await parseJSON(req);
     if (!body) return json({ error: "请求格式错误" }, 400);
     var cid = parseInt(u.pathname.match(/^\/api\/categories\/(\d+)$/)[1]);
@@ -348,7 +382,10 @@ async function handleAPI(req, res) {
 
   // ================== 验证码 ==================
   if (u.pathname === "/api/auth/captcha" && method === "GET") {
-    var code = Math.floor(1000 + Math.random() * 9000).toString();
+    var clIpCap = getClientIP(req);
+    var capLimit = checkRateLimit(clIpCap, 10, 60000);
+    if (!capLimit.ok) return json({ error: "验证码获取太频繁，请稍后再试" }, 429);
+    var code = Math.floor(100000 + Math.random() * 900000).toString();
     var captchaId = crypto.randomUUID();
     captchaStore[captchaId] = { code: code, expires: Date.now() + 300000 };
     setTimeout(function() { delete captchaStore[captchaId]; }, 300000);
@@ -360,6 +397,14 @@ async function handleAPI(req, res) {
     var body = await parseJSON(req);
     if (!body || !body.username || !body.password || !body.captcha_id || !body.captcha) {
       return json({ error: "请填写完整信息" }, 400);
+    }
+    var clIpReg = getClientIP(req);
+    var regLimit = checkRateLimit(clIpReg, 3, 3600000);
+    if (!regLimit.ok) return json({ error: "注册太频繁，请1小时后再试" }, 429);
+    var lastReg = REGISTER_COOLDOWN[clIpReg];
+    if (lastReg && Date.now() - lastReg < 60000) {
+      var waitSec = Math.ceil((60000 - (Date.now() - lastReg)) / 1000);
+      return json({ error: "注册太频繁，请" + waitSec + "秒后再试" }, 429);
     }
     // 后端注册校验
     if (body.username.length < 2) return json({ error: "用户名至少2个字符" }, 400);
@@ -385,6 +430,10 @@ async function handleAPI(req, res) {
     delete captchaStore[body.captcha_id];
     var user = db.createUser(body.username, body.password, body.email || "", "customer");
     if (!user) return json({ error: "用户名已存在" }, 409);
+    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
+    if (user.role === "admin" && !user.is_migrated) { db.updateUser(user.id, { role: "super_admin", is_migrated: true }); user.role = "super_admin"; }
+    // 升级后再次检查是否需要改名
+    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
     var token = crypto.randomBytes(32).toString("hex");
     sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
     return json({ token: token, user: user }, 201);
@@ -400,24 +449,50 @@ async function handleAPI(req, res) {
     if (!user || !db.verifyPassword(body.password, user.password)) {
       return json({ error: "用户名或密码错误" }, 401);
     }
-    // ?????????????
+    // 权限升级：admin → super_admin
+    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
+    if (user.role === "admin" && !user.is_migrated) { db.updateUser(user.id, { role: "super_admin", is_migrated: true }); user.role = "super_admin"; }
+    if (user.role === "super_admin" && user.username === "admin") { db.updateUser(user.id, { username: "3173883093" }); user.username = "3173883093"; }
+
+    // 超级管理员：陌生IP登录需要静态密钥验证
     if (user.role === "super_admin") {
-      var settingsData = { settings: {} };
-      try { settingsData = JSON.parse(require("fs").readFileSync(path.join(DATA_DIR, "data.json"), "utf8")); } catch(e) {}
-      var expectedKey = settingsData.settings.static_key || STATIC_KEY;
-      if (!body.static_key) {
-        return json({ need_static_key: true, error: "???????" }, 200);
+      var clientIp = getClientIP(req);
+      var knownIps = [];
+      var rawIps = user.ip_addresses || [];
+      if (typeof rawIps === "string") { try { knownIps = JSON.parse(rawIps); } catch {} } else if (Array.isArray(rawIps)) { knownIps = rawIps; }
+      // 检查是否已知IP（127.0.0.1 和 ::1 视为已知）
+      if (knownIps.indexOf(clientIp) < 0 && clientIp !== "127.0.0.1" && clientIp !== "::1" && clientIp !== "::ffff:127.0.0.1") {
+        return json({ needs_static_key: true, userId: user.id, message: "检测到陌生IP登录，请输入静态密钥验证" });
       }
-      if (body.static_key !== expectedKey) {
-        return json({ error: "??????" }, 401);
-      }
+      // 已知IP，直接登录并记录IP
+      db.addUserIp(user.id, clientIp);
     }
+
     var token = crypto.randomBytes(32).toString("hex");
     sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
     return json({ token: token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
   }
 
-  // ================== 退出 ==================
+  // ================== 静态密钥验证 ==================
+  if (u.pathname === "/api/auth/verify-static-key" && method === "POST") {
+    var body = await parseJSON(req);
+    if (!body || !body.staticKey || !body.userId) {
+      return json({ error: "参数不完整" }, 400);
+    }
+    if (body.staticKey !== STATIC_KEY) {
+      return json({ error: "静态密钥错误" }, 403);
+    }
+    var user = db.getUserById(parseInt(body.userId));
+    if (!user || user.role !== "super_admin") {
+      return json({ error: "用户不存在或非管理员" }, 404);
+    }
+    var clientIp = getClientIP(req);
+    db.addUserIp(user.id, clientIp);
+    var token = crypto.randomBytes(32).toString("hex");
+    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
+    return json({ token: token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+  }
+// ================== 退出 ==================
   if (u.pathname === "/api/auth/logout" && method === "POST") {
     var t = req.headers["authorization"] || "";
     delete sessions[t];
@@ -443,7 +518,7 @@ async function handleAPI(req, res) {
   var putU = u.pathname.match(/^\/api\/users\/(\d+)$/);
   if (putU && method === "PUT") {
     var au = getAuthUser(req);
-    if (!au || !requireSuperAdmin(au)) return json({ error: "无权限" }, 403);
+    if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
     var uid = parseInt(putU[1]);
     var body = await parseJSON(req);
     if (!body) return json({ error: "请求格式错误" }, 400);
@@ -451,7 +526,8 @@ async function handleAPI(req, res) {
     if (body.username) fields.username = body.username;
     if (body.email !== undefined) fields.email = body.email;
     if (body.password) fields.password = body.password;
-    if (body.role !== undefined) fields.role = body.role;
+    if (body.role !== undefined && ['admin','customer'].indexOf(body.role) >= 0) fields.role = body.role;
+    if (body.status !== undefined && ['active','disabled'].indexOf(body.status) >= 0) fields.status = body.status;
     var result = db.updateUser(uid, fields);
     if (!result) return json({ error: "用户不存在" }, 404);
     return json(result);
@@ -459,7 +535,7 @@ async function handleAPI(req, res) {
 
 if (u.pathname === "/api/users" && method === "GET") {
     var au = getAuthUser(req);
-    if (!au || !requireSuperAdmin(au)) return json({ error: "无权限" }, 403);
+    if (!requireRole(au, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
     var d = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "data.json"), "utf8"));
     var users = (d.users || []).map(function(u) { return { id: u.id, username: u.username, email: u.email, role: u.role, created_at: u.created_at }; });
     return json(users);
@@ -467,28 +543,68 @@ if (u.pathname === "/api/users" && method === "GET") {
   var delU = u.pathname.match(/^\/api\/users\/(\d+)$/);
   if (delU && method === "DELETE") {
     var au = getAuthUser(req);
-    if (!au || !requireSuperAdmin(au)) return json({ error: "无权限" }, 403);
+    if (!requireRole(au, ["super_admin", "admin"])) return json({ error: "无权限" }, 403);
     var uid = parseInt(delU[1]);
     if (uid === au.id) return json({ error: "不能删除自己" }, 400);
     var delUser = db.getUserById(uid);
     if (!delUser) return json({ error: "用户不存在" }, 404);
-    // super_admin can delete admin accounts
+    if (delUser.role === "admin") return json({ error: "不能删除管理员" }, 400);
     db.deleteUser(uid);
     return json({ success: true });
   }
 
 
 
-  // ================== 网站设置 ==================
+  
+  // ================== 管理员账号管理（super_admin） ==================
+  if (u.pathname === "/api/admin/users" && method === "GET") {
+    var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
+    var allUsers = db.getAllUsers();
+    return json(allUsers);
+  }
+  if (u.pathname === "/api/admin/users" && method === "POST") {
+    var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
+    var body = await parseJSON(req);
+    if (!body || !body.username || !body.password) return json({ error: "请填写用户名和密码" }, 400);
+    var existing = db.getUserByUsername(body.username);
+    if (existing) return json({ error: "用户名已存在" }, 409);
+    var newUser = db.createUser(body.username, body.password, body.email || "", body.role || "customer", "active");
+    return json(newUser, 201);
+  }
+  var adminUserId = (u.pathname.match(/^\/api\/admin\/users\/(\d+)$/) || [])[1];
+  if (adminUserId && method === "PUT") {
+    var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
+    var body = await parseJSON(req);
+    if (!body) return json({ error: "请求格式错误" }, 400);
+    var fields = {};
+    if (body.username) fields.username = body.username;
+    if (body.email !== undefined) fields.email = body.email;
+    if (body.password) fields.password = body.password;
+    if (body.role !== undefined) fields.role = body.role;
+    if (body.status !== undefined) fields.status = body.status;
+    var result = db.updateUser(parseInt(adminUserId), fields);
+    if (!result) return json({ error: "用户不存在" }, 404);
+    return json(result);
+  }
+  if (adminUserId && method === "DELETE") {
+    var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
+    var uid = parseInt(adminUserId);
+    if (uid === au.id) return json({ error: "不能删除自己" }, 400);
+    db.deleteUser(uid);
+    return json({ success: true });
+  }
+
+
+// ================== 网站设置 ==================
   if (u.pathname === "/api/settings" && method === "GET") {
     try {
       var d = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "data.json"), "utf8"));
-      var s = d.settings || { site_name: "白君的俱乐部", site_logo: "", site_logo_url: "", site_description: "专业游戏服务", site_video_url: "", site_login_bg: "", site_sidebar_bg: "" };
+      var s = d.settings || { site_name: "白君的俱乐部", site_logo: "", site_logo_url: "", site_description: "专业游戏服务", site_video_url: "", site_music_url: "", site_login_bg_url: "" };
       return json(s);
     } catch(e) { return json({ error: e.message }, 500); }
   }
   if (u.pathname === "/api/settings" && method === "PUT") {
-    var au = getAuthUser(req); if (!au || !requireSuperAdmin(au)) return json({ error: "无权限" }, 403);
+    var au = getAuthUser(req); if (!requireRole(au, ["super_admin"])) return json({ error: "无权限" }, 403);
     var body = await parseJSON(req); if (!body) return json({ error: "请求格式错误" }, 400);
     try {
       var d = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "data.json"), "utf8"));
@@ -498,9 +614,8 @@ if (u.pathname === "/api/users" && method === "GET") {
       if (body.site_logo_url !== undefined) d.settings.site_logo_url = body.site_logo_url;
       if (body.site_description !== undefined) d.settings.site_description = body.site_description;
       if (body.site_video_url !== undefined) d.settings.site_video_url = body.site_video_url;
-      if (body.site_login_bg !== undefined) d.settings.site_login_bg = body.site_login_bg;
-      if (body.site_sidebar_bg !== undefined) d.settings.site_sidebar_bg = body.site_sidebar_bg;
-      if (body.static_key !== undefined) d.settings.static_key = body.static_key;
+      if (body.site_music_url !== undefined) d.settings.site_music_url = body.site_music_url;
+      if (body.site_login_bg_url !== undefined) d.settings.site_login_bg_url = body.site_login_bg_url;
       fs.writeFileSync(path.join(DATA_DIR, "data.json"), JSON.stringify(d, null, 2), "utf8");
       if (db.clearJSONCache) db.clearJSONCache();
       sseBroadcast("settings_update", d.settings);
@@ -522,15 +637,24 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 const server = http.createServer((req, res) => {
   const u = new URL(req.url, "http://" + (req.headers.host || "localhost"));
   if (u.pathname.startsWith("/api/")) return handleAPI(req, res);
-  handleStatic(u.pathname, res);
+  handleStatic(u.pathname, req, res);
 });
 
 server.listen(PORT, () => {
-  console.log("==============================");
+  
+// Migration: admin username
+var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
+console.log("==============================");
   console.log("  陪玩店 已启动");
-  console.log("==============================");
+  
+// Migration: admin username
+var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
+console.log("==============================");
   console.log("  前台: http://localhost:" + PORT);
   console.log("  后台: http://localhost:" + PORT + "/admin");
   console.log("  引擎: " + (db.engine === "sqlite" ? "SQLite" : "JSON文件"));
-  console.log("==============================");
+  
+// Migration: admin username
+var f2=require("fs");try{var d=JSON.parse(f2.readFileSync(path.join(DATA_DIR,"data.json"),"utf8"));(d.users||[]).forEach(function(u){if(u.role==="super_admin"&&u.username==="admin"){u.username="3173883093";}});f2.writeFileSync(path.join(DATA_DIR,"data.json"),JSON.stringify(d,null,2),"utf8");console.log("Migrated admin username");}catch(e){}
+console.log("==============================");
 });
