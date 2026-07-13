@@ -382,7 +382,7 @@ function updateUser(id, fields) {
     if (fields.username) { sets.push('username = ?'); vals.push(fields.username); }
     if (fields.email !== undefined) { sets.push('email = ?'); vals.push(fields.email); }
     if (fields.role !== undefined) { sets.push('role = ?'); vals.push(fields.role); }
-    if (fields.password) { var h = crypto.createHash('sha256').update(fields.password).digest('hex'); sets.push('password = ?'); vals.push(h); }
+    if (fields.password) { var h = crypto.scryptSync(fields.password, 'peiwang-salt-2024', 32).toString('hex'); sets.push('password = ?'); vals.push(h); }
     if (sets.length === 0) return null;
     vals.push(id);
     db.prepare('UPDATE users SET ' + sets.join(', ') + ' WHERE id = ?').run.apply(db, vals);
@@ -394,7 +394,7 @@ function updateUser(id, fields) {
   if (fields.username) d.users[idx].username = fields.username;
   if (fields.email !== undefined) d.users[idx].email = fields.email;
   if (fields.role !== undefined) d.users[idx].role = fields.role;
-  if (fields.password) d.users[idx].password = crypto.createHash('sha256').update(fields.password).digest('hex');
+  if (fields.password) d.users[idx].password = crypto.scryptSync(fields.password, 'peiwang-salt-2024', 32).toString('hex');
   saveJSON();
   return { id: d.users[idx].id, username: d.users[idx].username, email: d.users[idx].email, role: d.users[idx].role, created_at: d.users[idx].created_at };
 }
