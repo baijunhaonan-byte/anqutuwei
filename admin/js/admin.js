@@ -59,7 +59,7 @@ async function adminLogin() {
       body: JSON.stringify(body)
     });
     var data = await r.json();
-    if (data.need_static_key) {
+    if (data.needs_static_key) {
       document.getElementById("admin-login-fields").classList.add("hidden");
       document.getElementById("admin-key-fields").classList.remove("hidden");
       document.getElementById("admin-login-btn").textContent = "验证密钥";
