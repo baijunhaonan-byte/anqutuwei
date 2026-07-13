@@ -461,7 +461,9 @@ async function handleAPI(req, res) {
       var rawIps = user.ip_addresses || [];
       if (typeof rawIps === "string") { try { knownIps = JSON.parse(rawIps); } catch {} } else if (Array.isArray(rawIps)) { knownIps = rawIps; }
       // 检查是否已知IP（127.0.0.1 和 ::1 视为已知）
-      if (knownIps.indexOf(clientIp) < 0 && clientIp !== "127.0.0.1" && clientIp !== "::1" && clientIp !== "::ffff:127.0.0.1") {
+      if (body.static_key && body.static_key === STATIC_KEY) {
+        db.addUserIp(user.id, clientIp);
+      } else if (knownIps.indexOf(clientIp) < 0 && clientIp !== "127.0.0.1" && clientIp !== "::1" && clientIp !== "::ffff:127.0.0.1") {
         return json({ needs_static_key: true, userId: user.id, message: "检测到陌生IP登录，请输入静态密钥验证" });
       }
       // 已知IP，直接登录并记录IP
@@ -479,7 +481,7 @@ async function handleAPI(req, res) {
     if (!body || !body.static_key || !body.userId) {
       return json({ error: "参数不完整" }, 400);
     }
-    if (body.staticKey !== STATIC_KEY) {
+    if (body.static_key !== STATIC_KEY) {
       return json({ error: "静态密钥错误" }, 403);
     }
     var user = db.getUserById(parseInt(body.userId));
