@@ -46,3 +46,5 @@ admin/*.bak
 *.bak
 33107
 public/css/style_backup.css
+
+!tupian/anqu.mp4
