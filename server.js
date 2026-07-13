@@ -462,12 +462,12 @@ async function handleAPI(req, res) {
       if (typeof rawIps === "string") { try { knownIps = JSON.parse(rawIps); } catch {} } else if (Array.isArray(rawIps)) { knownIps = rawIps; }
       // 检查是否已知IP（127.0.0.1 和 ::1 视为已知）
       if (body.static_key && body.static_key === STATIC_KEY) {
-        db.addUserIp(user.id, clientIp);
+        db.updateUserLastIP(user.id, clientIp);
       } else if (knownIps.indexOf(clientIp) < 0 && clientIp !== "127.0.0.1" && clientIp !== "::1" && clientIp !== "::ffff:127.0.0.1") {
         return json({ needs_static_key: true, userId: user.id, message: "检测到陌生IP登录，请输入静态密钥验证" });
       }
       // 已知IP，直接登录并记录IP
-      db.addUserIp(user.id, clientIp);
+      db.updateUserLastIP(user.id, clientIp);
     }
 
     var token = crypto.randomBytes(32).toString("hex");
@@ -489,7 +489,7 @@ async function handleAPI(req, res) {
       return json({ error: "用户不存在或非管理员" }, 404);
     }
     var clientIp = getClientIP(req);
-    db.addUserIp(user.id, clientIp);
+    db.updateUserLastIP(user.id, clientIp);
     var token = crypto.randomBytes(32).toString("hex");
     sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
     return json({ token: token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
