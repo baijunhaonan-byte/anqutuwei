@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -10,11 +10,16 @@
   <!-- ================== 管理员登录 ================== -->
   <div id="admin-login-screen">
     <div class="admin-login-box">
-      <h2>🐾 管理后台</h2>
+      <h2>管理后台</h2>
       <p class="admin-login-desc">管理员登录</p>
-      <input id="admin-login-user" placeholder="用户名" class="admin-login-input">
-      <input id="admin-login-pass" type="password" placeholder="密码" class="admin-login-input" onkeydown="if(event.key==='Enter')adminLogin()">
-      <button class="btn btn-primary admin-login-btn" onclick="adminLogin()">登录</button>
+      <div id="admin-login-fields">
+        <input id="admin-login-user" placeholder="用户名" class="admin-login-input">
+        <input id="admin-login-pass" type="password" placeholder="密码" class="admin-login-input" onkeydown="if(event.key==='Enter')adminLogin()">
+        <button id="admin-login-btn" class="btn btn-primary admin-login-btn" onclick="adminLogin()">登录</button>
+      </div>
+      <div id="admin-key-fields" class="hidden">
+        <input id="admin-static-key" type="password" placeholder="输入静态密钥" class="admin-login-input" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
       <div id="admin-login-error" class="admin-login-error hidden"></div>
     </div>
   </div>
@@ -24,27 +29,27 @@
     <div id="app">
       <aside id="admin-sidebar">
         <div class="admin-logo">
-          <span>🐾 管理后台</span>
+          <span>管理后台</span>
           <span class="admin-logout-link" onclick="adminLogout()">退出</span>
         </div>
         <nav class="admin-nav">
-          <div class="nav-item active" data-tab="orders" onclick="switchTab('orders')">📋 订单管理</div>
-          <div class="nav-item" data-tab="menu" onclick="switchTab('menu')">📋 项目管理</div>
-          <div class="nav-item" data-tab="chat" onclick="switchTab('chat')">💬 客服聊天</div>
-          <div class="nav-item" data-tab="consumption" onclick="switchTab('consumption')">📊 消费记录</div>
-          <div class="nav-item" data-tab="categories" onclick="switchTab('categories')">🏷️ 分类管理</div>
-          <div class="nav-item" data-tab="users" onclick="switchTab('users')">👥 用户管理</div>
-          <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">⚙️ 网站设置</div>
+          <div class="nav-item active" data-tab="orders" onclick="switchTab('orders')">订单管理</div>
+          <div class="nav-item" data-tab="menu" onclick="switchTab('menu')">项目管理</div>
+          <div class="nav-item" data-tab="chat" onclick="switchTab('chat')">客服聊天</div>
+          <div class="nav-item" data-tab="consumption" onclick="switchTab('consumption')">消费记录</div>
+          <div class="nav-item" data-tab="categories" onclick="switchTab('categories')">分类管理</div>
+          <div class="nav-item" data-tab="users" onclick="switchTab('users')">用户管理</div>
+          <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">网站设置</div>
         </nav>
         <div class="admin-sidebar-footer">
-          <a href="/" target="_blank" class="admin-link">🔗 查看前台</a>
+          <a href="/" target="_blank" class="admin-link">查看前台</a>
         </div>
       </aside>
 
       <main id="admin-main">
         <div id="tab-orders" class="admin-tab active">
           <div class="tab-header">
-            <h2>📋 订单管理</h2>
+            <h2>订单管理</h2>
             <div class="tab-actions">
               <select id="order-filter" onchange="loadOrders()">
                 <option value="">全部订单</option>
@@ -61,7 +66,7 @@
 
         <div id="tab-menu" class="admin-tab">
           <div class="tab-header">
-            <h2>📋 项目管理</h2>
+            <h2>项目管理</h2>
             <button onclick="showAddMenuItem()" class="btn btn-primary">+ 新增项目</button>
           </div>
           <div id="menu-table-container"></div>
@@ -69,40 +74,40 @@
 
         <div id="tab-chat" class="admin-tab">
           <div class="tab-header">
-            <h2>💬 客服聊天</h2>
+            <h2>客服聊天</h2>
           </div>
           <div id="chat-list-container"></div>
         </div>
 
         <div id="tab-categories" class="admin-tab">
           <div class="tab-header">
-            <h2>🏷️ 分类管理</h2>
+            <h2>分类管理</h2>
           </div>
           <div id="category-table-container"></div>
         </div>
 
         <div id="tab-consumption" class="admin-tab">
           <div class="tab-header">
-            <h2>📊 消费记录</h2>
+            <h2>消费记录</h2>
             <button onclick="showAddConsumption()" class="btn btn-primary">+ 新增记录</button>
           </div>
           <div id="consumption-table-container"></div>
         </div>
-  
+
         <div id="tab-settings" class="admin-tab">
           <div class="tab-header">
-            <h2>⚙️ 网站设置</h2>
+            <h2>网站设置</h2>
           </div>
           <div id="settings-container"></div>
         </div>
 
         <div id="tab-users" class="admin-tab">
           <div class="tab-header">
-            <h2>👥 用户管理</h2>
+            <h2>用户管理</h2>
           </div>
           <div id="user-table-container"></div>
         </div>
-    </main>
+      </main>
     </div>
   </div>
 
@@ -117,8 +122,8 @@
     </div>
   </div>
 
-  <script src="/admin/js/admin.js"></script>
-  <script src="/admin/js/users.js"></script>
-  <script src="/admin/js/categories.js"></script>
+  <script src="/admin/js/admin.js?v=2"></script>
+  <script src="/admin/js/users.js?v=2"></script>
+  <script src="/admin/js/categories.js?v=2"></script>
 </body>
 </html>

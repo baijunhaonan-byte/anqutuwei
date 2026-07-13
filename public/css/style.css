@@ -137,6 +137,7 @@ body {
   background: rgba(255,255,255,0.12);
   border-radius: 12px;
   overflow: hidden;
+  background: rgba(30, 30, 40, 0.85);
   cursor: pointer;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
@@ -226,7 +227,7 @@ body {
   -webkit-backdrop-filter: blur(5px);
   box-shadow: 0 1px 6px rgba(0,0,0,0.06);
 }
-#chat-msgs p { margin-bottom: 8px; line-height: 1.5; font-size: 14px; }
+#chat-msgs p { margin-bottom: 8px; line-height: 1.5; font-size: 14px; color: #fff; }
 #chat-msgs b { color: #fff; }
 .chat-input-area { display: flex; gap: 8px; }
 #chat-input {
@@ -312,10 +313,35 @@ body {
 }
 .modal-overlay.hidden { display: none; }
 .modal-box {
-  background: #fff; border-radius: 12px;
+  background: transparent;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
   width: 90%; max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  overflow: hidden;
+  background: rgba(30, 30, 40, 0.85);
 }
+.modal-box.has-bg .modal-box-header {
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.modal-box.has-bg .modal-box-header h3 { color: #fff; }
+.modal-box.has-bg .modal-box-body { background: rgba(0,0,0,0.3); }
+.modal-box.has-bg .modal-box-body label span { color: rgba(255,255,255,0.85); }
+.modal-box.has-bg .modal-box-body input {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+}
+.modal-box.has-bg .modal-box-body input::placeholder { color: rgba(255,255,255,0.6); }
+.modal-box.has-bg .modal-box-body input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+}
+.modal-box.has-bg .modal-link { color: #87ceeb; }
+.modal-box.has-bg .modal-close-btn { color: rgba(255,255,255,0.8); }
+.modal-box.has-bg .modal-close-btn:hover { color: #fff; }
 .modal-box-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 18px 20px; border-bottom: 1px solid #f0f0f0;
@@ -358,3 +384,225 @@ body {
 #music-toggle{width:48px;height:48px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);box-shadow:0 2px 10px rgba(0,0,0,0.2);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 #music-toggle:hover{transform:scale(1.1);}
 #music-toggle.paused{opacity:0.6;}
+﻿/* ===================== 锁屏 ===================== */
+#lockscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483647 !important;
+  overflow: hidden;
+  background: #000 !important;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#lockscreen.unlocking { transform: translateY(-100%); }
+#lockscreen.unlocked { display: none; }
+#lockscreen-video-wrap {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+#lockscreen-video-wrap video {
+  min-width: 100%; min-height: 100%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+#lockscreen-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.55);
+}
+#lockscreen-content {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 2;
+}
+.lock-time {
+  font-size: 72px;
+  font-weight: 200;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  margin-bottom: 4px;
+}
+.lock-date {
+  font-size: 18px;
+  opacity: 0.85;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  margin-bottom: 60px;
+}
+.lock-hint {
+  position: absolute;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  opacity: 0.7;
+  animation: hintBounce 2s ease-in-out infinite;
+  cursor: pointer;
+}
+.lock-arrow {
+  font-size: 24px;
+  display: block;
+}
+@keyframes hintBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ===================== 侧边栏背景图支持 ===================== */
+#sidebar {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+#sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, rgba(44,62,80,0.7), rgba(52,73,94,0.7));
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.5s;
+}
+#sidebar > * { position: relative; z-index: 1; }
+#sidebar.has-sidebar-bg::before { opacity: 0.3; }
+
+/* ===================== 动态效果 ===================== */
+.page.active {
+  animation: pageFadeIn 0.4s ease-out;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 分类卡片悬浮光效 */
+.hero-cat-card {
+  position: relative;
+  overflow: hidden;
+}
+.hero-cat-card::after {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.hero-cat-card:hover::after { opacity: 1; }
+
+/* 分类项滑动高亮 */
+.cat-item { position: relative; overflow: hidden; }
+.cat-item::before {
+  content: "";
+  position: absolute; left: 0; top: 0;
+  height: 100%; width: 3px;
+  background: #3498db;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.cat-item:hover::before { transform: translateX(0); }
+.cat-item.active::before { transform: translateX(0); }
+
+/* 按钮脉冲效果 */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: "";
+  position: absolute; top: 50%; left: 50%;
+  width: 0; height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: width 0.4s, height 0.4s, top 0.4s, left 0.4s;
+}
+.btn-primary:active::after {
+  width: 200px; height: 200px;
+  top: -50px; left: -50px;
+}
+
+/* 侧边栏悬浮 */
+.cat-item { transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.cat-item:hover { padding-left: 24px; background: rgba(255,255,255,0.12); }
+
+/* 通知弹出 */
+.notification {
+  animation: notifSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateX(40px) scale(0.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* 模态框打开 */
+.modal-overlay:not(.hidden) .modal-box {
+  animation: modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 购物车呼吸 */
+.cart-btn { animation: btnPulse 2s ease-in-out infinite; }
+@keyframes btnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(231,76,60,0); }
+}
+
+
+/* ===================== 菜单卡片入场动画 ===================== */
+.menu-card {
+  animation: cardFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.menu-card:nth-child(1) { animation-delay: 0.05s; }
+.menu-card:nth-child(2) { animation-delay: 0.1s; }
+.menu-card:nth-child(3) { animation-delay: 0.15s; }
+.menu-card:nth-child(4) { animation-delay: 0.2s; }
+.menu-card:nth-child(5) { animation-delay: 0.25s; }
+.menu-card:nth-child(6) { animation-delay: 0.3s; }
+.menu-card:nth-child(7) { animation-delay: 0.35s; }
+.menu-card:nth-child(8) { animation-delay: 0.4s; }
+.menu-card:nth-child(9) { animation-delay: 0.45s; }
+.menu-card:nth-child(10) { animation-delay: 0.5s; }
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.menu-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+.menu-card:hover img {
+  transform: scale(1.08);
+}
+.menu-card img {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.price {
+  transition: all 0.3s;
+}
+.menu-card:hover .price {
+  transform: scale(1.1);
+  color: #ff4757;
+}
+.menu-card-body {
+  transition: transform 0.3s;
+}
+.menu-card:hover .menu-card-body {
+  transform: translateY(-2px);
+}

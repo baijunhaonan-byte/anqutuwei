@@ -1,0 +1,776 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "护航",
+      "icon": "🛡️",
+      "sort_order": 1,
+      "image": "/uploads/1783855677513-b849e44d.webp"
+    },
+    {
+      "id": 2,
+      "name": "陪玩",
+      "icon": "🎃",
+      "sort_order": 2,
+      "image": "/uploads/1783855690438-668bf25c.webp"
+    },
+    {
+      "id": 3,
+      "name": "趣味单",
+      "icon": "🎆",
+      "sort_order": 3,
+      "image": "/uploads/1783855700294-2ea4ff52.jpg"
+    },
+    {
+      "id": 4,
+      "name": "代肝",
+      "icon": "💎",
+      "sort_order": 4,
+      "image": "/uploads/1783855731546-75ce092f.jpg"
+    }
+  ],
+  "menu_items": [
+    {
+      "id": 6,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 68,
+      "description": "68保988W",
+      "image": "/uploads/1783928553289-da97c46a.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 7,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 128,
+      "description": "128保1858W",
+      "image": "/uploads/1783928561299-2b986612.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 8,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 198,
+      "description": "198保2888W",
+      "image": "/uploads/1783928567085-17ff7d62.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 9,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 258,
+      "description": "258保3758W",
+      "image": "/uploads/1783928573436-9bc13e02.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 10,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 378,
+      "description": "378保5488W",
+      "image": "/uploads/1783928580199-22bfdd52.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 11,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 520,
+      "description": "520保7500W以上",
+      "image": "/uploads/1783928586103-d1b4375f.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 12,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 688,
+      "description": "688保1E以上",
+      "image": "/uploads/1783928592951-f6f82e5d.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 13,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 98,
+      "description": "98保1288W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
+      "image": "/uploads/1783928927017-ee01eb3e.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 14,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 158,
+      "description": "158保2088W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
+      "image": "/uploads/1783928956492-ee84e52e.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 15,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 258,
+      "description": "258保3588W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
+      "image": "/uploads/1783928962300-4906b712.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 16,
+      "category_id": 2,
+      "name": "娱乐女陪",
+      "price": 58,
+      "description": "58/1H",
+      "image": "/uploads/1783929550433-8a0146d7.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 17,
+      "category_id": 2,
+      "name": "技术女陪",
+      "price": 68,
+      "description": "68/1H；技术女陪情绪价值技术双在线可带熟图",
+      "image": "/uploads/1783929574051-4155ae58.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 18,
+      "category_id": 2,
+      "name": "技术男陪",
+      "price": 48,
+      "description": "48/1H；陪陪出金打人装备都归老板哦～",
+      "image": "/uploads/1783929588052-7d52d881.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 19,
+      "category_id": 4,
+      "name": "3*3套餐一",
+      "price": 358,
+      "description": "60个任务包磨损+加急（1-3天完成，一般为2天内）",
+      "image": "/uploads/1783929772889-3cd50ece.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 20,
+      "category_id": 4,
+      "name": "3*3套餐二",
+      "price": 308,
+      "description": "60个任务包磨损（3-5天内完成）",
+      "image": "/uploads/1783929790271-224ab252.webp",
+      "is_available": 1
+    },
+    {
+      "id": 21,
+      "category_id": 4,
+      "name": "3*3套餐三",
+      "price": 318,
+      "description": "6个任务不包磨损+加急（1-3天内完成）",
+      "image": "/uploads/1783929802415-7a99094f.webp",
+      "is_available": 1
+    },
+    {
+      "id": 22,
+      "category_id": 4,
+      "name": "3*3套餐四",
+      "price": 288,
+      "description": "60个任务不包磨损（3-5天内完成）",
+      "image": "/uploads/1783929810341-7073e5df.jpg",
+      "is_available": 1
+    }
+  ],
+  "orders": [],
+  "chat_messages": [
+    {
+      "id": 1,
+      "order_id": 1,
+      "sender": "customer",
+      "message": "你好，我下单了王者上分，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T05:23:08.476Z"
+    },
+    {
+      "id": 2,
+      "order_id": 1,
+      "sender": "admin",
+      "message": "好的",
+      "is_read": 0,
+      "created_at": "2026-07-12T05:23:29.805Z"
+    },
+    {
+      "id": 3,
+      "order_id": 3,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:43:09.854Z"
+    },
+    {
+      "id": 4,
+      "order_id": 4,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:44:25.384Z"
+    },
+    {
+      "id": 5,
+      "order_id": 5,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:48:37.496Z"
+    },
+    {
+      "id": 6,
+      "order_id": 5,
+      "sender": "admin",
+      "message": "您好你确定下单吗",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:48:58.803Z"
+    },
+    {
+      "id": 7,
+      "order_id": 5,
+      "sender": "customer",
+      "message": "确定",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:49:07.035Z"
+    },
+    {
+      "id": 8,
+      "order_id": 6,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:51:33.858Z"
+    },
+    {
+      "id": 9,
+      "order_id": 6,
+      "sender": "customer",
+      "message": "嘀嘀嘀",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:51:40.559Z"
+    },
+    {
+      "id": 10,
+      "order_id": 6,
+      "sender": "admin",
+      "message": "在的",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:51:50.808Z"
+    },
+    {
+      "id": 11,
+      "order_id": 6,
+      "sender": "admin",
+      "message": "您这边确定下单吗",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:51:59.666Z"
+    },
+    {
+      "id": 12,
+      "order_id": 6,
+      "sender": "customer",
+      "message": "确定",
+      "is_read": 0,
+      "created_at": "2026-07-12T07:52:08.968Z"
+    },
+    {
+      "id": 13,
+      "order_id": 7,
+      "sender": "customer",
+      "message": "你好，我下单了三角洲寻宝，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:17:04.014Z"
+    },
+    {
+      "id": 14,
+      "order_id": 8,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:17:36.634Z"
+    },
+    {
+      "id": 15,
+      "order_id": 9,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:18:59.502Z"
+    },
+    {
+      "id": 16,
+      "order_id": 9,
+      "sender": "admin",
+      "message": "您这边确定下单吗（发送收款微信号。。。。。。）",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:19:29.899Z"
+    },
+    {
+      "id": 17,
+      "order_id": 9,
+      "sender": "customer",
+      "message": "确认（支付定金。。。。。）",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:19:49.688Z"
+    },
+    {
+      "id": 18,
+      "order_id": 9,
+      "sender": "admin",
+      "message": "打手打完结单了",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:20:11.364Z"
+    },
+    {
+      "id": 19,
+      "order_id": 10,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:21:38.442Z"
+    },
+    {
+      "id": 20,
+      "order_id": 10,
+      "sender": "admin",
+      "message": "发送收款微信",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:21:51.295Z"
+    },
+    {
+      "id": 21,
+      "order_id": 10,
+      "sender": "customer",
+      "message": "支付",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:22:01.367Z"
+    },
+    {
+      "id": 22,
+      "order_id": 10,
+      "sender": "admin",
+      "message": "打手结单",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:22:21.887Z"
+    },
+    {
+      "id": 23,
+      "order_id": 11,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:26:33.325Z"
+    },
+    {
+      "id": 24,
+      "order_id": 11,
+      "sender": "admin",
+      "message": "发送收款渠道",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:26:48.034Z"
+    },
+    {
+      "id": 25,
+      "order_id": 11,
+      "sender": "customer",
+      "message": "支付",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:26:56.264Z"
+    },
+    {
+      "id": 26,
+      "order_id": 11,
+      "sender": "admin",
+      "message": "这边打手打完了",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:27:16.203Z"
+    },
+    {
+      "id": 27,
+      "order_id": 12,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "is_read": 0,
+      "created_at": "2026-07-12T08:29:04.450Z"
+    },
+    {
+      "id": 28,
+      "order_id": 13,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:07:50.534Z"
+    },
+    {
+      "id": 29,
+      "order_id": 13,
+      "sender": "admin",
+      "message": "1",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:08:14.015Z"
+    },
+    {
+      "id": 30,
+      "order_id": 13,
+      "sender": "admin",
+      "message": "",
+      "image": "/uploads/1783847540556-c9b76b65.jpg",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:12:20.559Z"
+    },
+    {
+      "id": 31,
+      "order_id": 14,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:24:01.537Z"
+    },
+    {
+      "id": 32,
+      "order_id": 15,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:29:23.749Z"
+    },
+    {
+      "id": 33,
+      "order_id": 16,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:29:23.755Z"
+    },
+    {
+      "id": 34,
+      "order_id": 16,
+      "sender": "customer",
+      "message": "你发",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:29:52.074Z"
+    },
+    {
+      "id": 35,
+      "order_id": 16,
+      "sender": "admin",
+      "message": "你好我是周炜杰",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:29:53.999Z"
+    },
+    {
+      "id": 36,
+      "order_id": 16,
+      "sender": "admin",
+      "message": "",
+      "image": "/uploads/1783848612564-ff9e6a06.jpg",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:30:12.568Z"
+    },
+    {
+      "id": 37,
+      "order_id": 16,
+      "sender": "admin",
+      "message": "已支付成功这边帮您确认订单",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:30:37.365Z"
+    },
+    {
+      "id": 38,
+      "order_id": 17,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:50:03.628Z"
+    },
+    {
+      "id": 39,
+      "order_id": 17,
+      "sender": "admin",
+      "message": "老妈好",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:50:34.169Z"
+    },
+    {
+      "id": 40,
+      "order_id": 17,
+      "sender": "admin",
+      "message": "",
+      "image": "/uploads/1783849860116-b317a513.jpg",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:51:00.119Z"
+    },
+    {
+      "id": 41,
+      "order_id": 17,
+      "sender": "admin",
+      "message": "扫二维码付一下定金",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:51:13.429Z"
+    },
+    {
+      "id": 42,
+      "order_id": 17,
+      "sender": "customer",
+      "message": "你好",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T09:51:42.730Z"
+    },
+    {
+      "id": 43,
+      "order_id": 18,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T10:00:00.543Z"
+    },
+    {
+      "id": 44,
+      "order_id": 19,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T10:00:43.020Z"
+    },
+    {
+      "id": 45,
+      "order_id": 22,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T10:05:14.537Z"
+    },
+    {
+      "id": 46,
+      "order_id": 23,
+      "sender": "customer",
+      "message": "你好，我下单了暗区无限护航，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T11:10:45.857Z"
+    },
+    {
+      "id": 47,
+      "order_id": 23,
+      "sender": "admin",
+      "message": "",
+      "image": "/uploads/1783854667237-937606ae.jpg",
+      "is_read": 0,
+      "created_at": "2026-07-12T11:11:07.239Z"
+    },
+    {
+      "id": 48,
+      "order_id": 23,
+      "sender": "customer",
+      "message": "扫码支付",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T11:11:17.078Z"
+    },
+    {
+      "id": 49,
+      "order_id": 23,
+      "sender": "admin",
+      "message": "开始派单",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T11:11:42.529Z"
+    },
+    {
+      "id": 50,
+      "order_id": 23,
+      "sender": "admin",
+      "message": "派单成功打完结单",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-12T11:12:03.161Z"
+    },
+    {
+      "id": 51,
+      "order_id": 24,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T03:20:38.414Z"
+    },
+    {
+      "id": 52,
+      "order_id": 25,
+      "sender": "customer",
+      "message": "你好，我下单了暗区无限护航，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:05.664Z"
+    },
+    {
+      "id": 53,
+      "order_id": 25,
+      "sender": "customer",
+      "message": "1",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:13.719Z"
+    },
+    {
+      "id": 54,
+      "order_id": 25,
+      "sender": "admin",
+      "message": "",
+      "image": "/uploads/1783920079564-f0707f83.jpg",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:19.566Z"
+    },
+    {
+      "id": 55,
+      "order_id": 25,
+      "sender": "customer",
+      "message": "1",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:31.230Z"
+    },
+    {
+      "id": 56,
+      "order_id": 25,
+      "sender": "admin",
+      "message": "123",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:42.710Z"
+    },
+    {
+      "id": 57,
+      "order_id": 25,
+      "sender": "customer",
+      "message": "12222",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:21:49.698Z"
+    },
+    {
+      "id": 58,
+      "order_id": 26,
+      "sender": "customer",
+      "message": "你好，我下单了暗区无限护航，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:27:06.411Z"
+    },
+    {
+      "id": 59,
+      "order_id": 26,
+      "sender": "admin",
+      "message": "1",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:30:24.183Z"
+    },
+    {
+      "id": 60,
+      "order_id": 26,
+      "sender": "customer",
+      "message": "123",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T05:30:27.339Z"
+    },
+    {
+      "id": 61,
+      "order_id": 27,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T06:09:48.314Z"
+    },
+    {
+      "id": 62,
+      "order_id": 28,
+      "sender": "customer",
+      "message": "你好，我下单了绝密航天单护，请确认！",
+      "image": "",
+      "is_read": 0,
+      "created_at": "2026-07-13T07:01:00.311Z"
+    }
+  ],
+  "consumption_records": [
+    {
+      "id": 14,
+      "order_id": 28,
+      "customer_name": "游客",
+      "menu_item_name": "绝密航天单护",
+      "quantity": 1,
+      "total_price": 50,
+      "confirmed_at": "2026-07-13T07:01:12.841Z"
+    }
+  ],
+  "_nextId": {
+    "category": 5,
+    "menu": 6,
+    "order": 29,
+    "chat": 63,
+    "consumption": 15,
+    "user": 5
+  },
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "702e810713e7c5196bc5fb3796b6f6d1e285acfb2334945f89670fa3aa70b38c",
+      "email": "admin@peiwang.com",
+      "role": "admin",
+      "created_at": "2026-07-12T03:35:00.917Z"
+    },
+    {
+      "id": 2,
+      "username": "demo",
+      "password": "313703ede2716e6787a864281b0d9a5bbf870303f56ff8d348ae03c4e25ae3ee",
+      "email": "demo@test.com",
+      "role": "customer",
+      "created_at": "2026-07-12T03:35:00.919Z"
+    },
+    {
+      "id": 3,
+      "username": "3173883093",
+      "password": "61a7b9e632f00188194c27321f0d9eafb1cf56c61453420b1f5104b397aa0af4",
+      "email": "3173883093@qq.com",
+      "role": "super_admin",
+      "status": "active",
+      "created_at": "2026-07-13T00:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "site_name": "甜粥俱乐部",
+    "site_logo": "🐾",
+    "site_description": "专业游戏服务by白君好难",
+    "site_logo_url": "/uploads/1783855498637-a990ca77.png",
+    "site_video_url": "/uploads/1783914599014-c578fcec.mp4",
+    "site_login_bg": "/uploads/1783868386168-43b2faae.webp",
+    "site_sidebar_bg": "/uploads/1783912575455-1a0acc40.webp"
+  }
+}

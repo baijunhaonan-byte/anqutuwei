@@ -84,7 +84,7 @@ function renderCategories() {
     if (c.image) {
       var img = document.createElement("img");
       img.src = c.image;
-      img.style.cssText = "width:20px;height:20px;object-fit:cover;border-radius:3px;vertical-align:middle;margin-right:6px;";
+      img.style.cssText = "width:28px;height:28px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:8px;";
       img.onerror = function() { this.style.display = "none"; };
       d.appendChild(img);
       var txt = document.createTextNode(c.name);
@@ -107,7 +107,9 @@ function renderHeroCategories() {
     if (c.image) {
       var img = document.createElement("img");
       img.src = c.image;
-      img.style.cssText = "width:50px;height:50px;object-fit:cover;border-radius:8px;margin-bottom:4px;";
+      img.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:16px;";
+      d.style.position = "relative";
+      d.style.overflow = "hidden";
       img.onerror = function() { this.style.display = "none"; };
       d.appendChild(img);
     } else {
@@ -118,7 +120,7 @@ function renderHeroCategories() {
     }
     var nameSpan = document.createElement("span");
     nameSpan.textContent = c.name;
-    nameSpan.style.cssText = "font-size:16px;color:#555;display:block;margin-top:4px;";
+    nameSpan.style.cssText = "position:absolute;bottom:0;left:0;font-size:15px;color:#fff;display:block;padding:10px 0;text-align:center;width:100%;background:linear-gradient(transparent,rgba(0,0,0,0.7));z-index:2;";
     d.appendChild(nameSpan);
     el.appendChild(d);
   }
@@ -484,8 +486,6 @@ function notify(msg) {
   setTimeout(function() { d.remove(); }, 3000);
 }
 
-
-
 // ======================== 登录系统 ========================
 var currentUser = null;
 var currentToken = localStorage.getItem("peiwang_token") || null;
@@ -523,6 +523,13 @@ function updateUserUI() {
 }
 
 function showLogin() {
+    // 加载登录背景图
+  fetch('/api/settings').then(function(r){return r.json();}).then(function(s){
+    var modal=document.querySelector('#login-modal .modal-box');
+    if(modal&&s.site_login_bg){
+      modal.style.background='url('+s.site_login_bg+') center/cover no-repeat';modal.classList.add('has-bg');
+    }
+  }).catch(function(){});
   document.getElementById("login-modal").classList.remove("hidden");
   document.getElementById("login-error").classList.add("hidden");
   document.getElementById("login-username").value = "";
@@ -668,7 +675,6 @@ async function logoutUser() {
   notify("已退出登录");
 }
 
-
 // ======================== 用户管理（后台跳转） ========================
 if (currentUser && currentUser.role === "admin") {
   var adminLink = document.createElement("div");
@@ -681,7 +687,6 @@ if (currentUser && currentUser.role === "admin") {
   adminLink.appendChild(a);
   document.getElementById("user-section").appendChild(adminLink);
 }
-
 
 // ======================== 网站设置 ========================
 async function loadSiteSettings() {
@@ -712,6 +717,24 @@ async function loadSiteSettings() {
       bgmAudio.src = s.site_music_url;
       bgmAudio.load();
     }
+    // 侧边栏背景图
+    var sidebar = document.getElementById('sidebar');
+    if (s.site_sidebar_bg && sidebar) {
+      sidebar.style.backgroundImage = 'url(' + s.site_sidebar_bg + ')';
+      sidebar.classList.add('has-sidebar-bg');
+    } else if (sidebar) {
+      sidebar.style.backgroundImage = '';
+      sidebar.classList.remove('has-sidebar-bg');
+    }
+    // 登录背景图片 - 应用到注册模态框
+    var regModal = document.getElementById('register-modal');
+    var regBox = regModal ? regModal.querySelector('.modal-box') : null;
+    if (s.site_login_bg) {
+      var bgStyle = 'url(' + s.site_login_bg + ')';
+      if (regBox) { regBox.style.backgroundImage = bgStyle; regBox.classList.add('has-bg'); }
+    } else {
+      if (regBox) { regBox.style.backgroundImage = ''; regBox.style.background = 'transparent'; regBox.classList.remove('has-bg'); }
+    }
   } catch(e) { console.warn('设置加载失败:', e); }
 }
 
@@ -738,3 +761,105 @@ function toggleMusic() {
   }
   isMusicPlaying = !isMusicPlaying;
 }
+
+// ======================== 锁屏 ========================
+(function initLockScreen() {
+  // 从设置加载锁屏视频
+  fetch('/api/settings').then(function(r){return r.json();}).then(function(s){
+    var v=document.getElementById('lockscreen-video');
+    if(v&&s.site_video_url){v.src=s.site_video_url;v.load();}
+  }).catch(function(){});
+
+  // 强制锁屏覆盖
+  var ls = document.getElementById("lockscreen");
+  if (ls) {
+    ls.style.setProperty("background", "#000", "important");
+    ls.style.setProperty("z-index", "99999", "important");
+  }
+  var video = document.getElementById("lockscreen-video");
+  var screen = document.getElementById("lockscreen");
+  var hint = document.getElementById("lock-hint");
+  var lockIcon = document.getElementById("lock-icon");
+  var timeEl = document.getElementById("lock-time");
+  var dateEl = document.getElementById("lock-date");
+  var bgVideo = document.getElementById("bg-video");
+  var bgmAudio = document.getElementById("bgm-audio");
+  if (!video || !screen) return;
+
+  // 更新时间显示
+  function updateDateTime() {
+    var now = new Date();
+    var h = String(now.getHours()).padStart(2, "0");
+    var m = String(now.getMinutes()).padStart(2, "0");
+    if (timeEl) timeEl.textContent = h + ":" + m;
+    if (dateEl) {
+      var week = ["日","一","二","三","四","五","六"];
+      dateEl.textContent = now.getFullYear() + "年" + (now.getMonth()+1) + "月" + now.getDate() + "日 星期" + week[now.getDay()];
+    }
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 10000);
+
+  // 显示视频第一帧作为封面，不播放
+  video.removeAttribute("loop");
+  video.currentTime = 0;
+  video.pause();
+
+  // 视频加载后显示第一帧
+  video.addEventListener("loadeddata", function() {
+    hint.style.opacity = "1";
+  });
+  // 如果视频加载慢，直接显示提示
+  setTimeout(function() {
+    hint.style.opacity = "1";
+  }, 2000);
+
+  // 用户交互触发解锁
+  function doUnlock(e) {
+    if (e) e.preventDefault();
+    if (screen.classList.contains("unlocking") || screen.classList.contains("unlocked")) return;
+
+    // 锁开启动画
+    if (lockIcon) {
+      lockIcon.textContent = "🔓";
+      lockIcon.classList.add("unlocked-icon");
+    }
+
+    // 开始解锁滑动动画
+    screen.classList.add("unlocking");
+
+    // 启动背景视频和音乐
+    if (bgVideo) {
+      bgVideo.muted = false;
+      bgVideo.volume = 0.25;
+      bgVideo.loop = true;
+      var p = bgVideo.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+
+
+    // 动画结束后隐藏锁屏
+    setTimeout(function() {
+      screen.classList.add("unlocked");
+      document.body.style.overflow = "auto";
+      // 自动弹出登录界面
+      if (typeof showLogin === "function") showLogin();
+    }, 600);
+  }
+
+  // 点击解锁
+  screen.addEventListener("click", doUnlock);
+
+  // 触摸上滑解锁
+  var touchStartY = 0;
+  screen.addEventListener("touchstart", function(e) {
+    touchStartY = e.touches[0].clientY;
+  });
+  screen.addEventListener("touchend", function(e) {
+    var dy = touchStartY - e.changedTouches[0].clientY;
+    if (dy > 50) doUnlock(e);
+  });
+
+  // 阻止锁屏时body滚动
+  document.body.style.overflow = "hidden";
+})();

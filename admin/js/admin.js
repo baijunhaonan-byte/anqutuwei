@@ -1,4 +1,4 @@
-﻿var adminToken = localStorage.getItem("peiwang_admin_token") || null;
+var adminToken = localStorage.getItem("peiwang_admin_token") || null;
 
 (async function checkAdminLogin() {
   if (adminToken) {
@@ -8,7 +8,7 @@
       });
       if (r.ok) {
         var user = await r.json();
-        if (user.role === "admin") {
+        if (user.role === "admin" || user.role === "super_admin") {
           showAdminApp();
   localStorage.setItem("peiwang_token", adminToken);
           return;
@@ -34,6 +34,8 @@ function showAdminApp() {
   loadOrders();
 }
 
+var adminLoginKeyToken = null;
+
 async function adminLogin() {
   var username = document.getElementById("admin-login-user").value.trim();
   var password = document.getElementById("admin-login-pass").value;
@@ -44,18 +46,35 @@ async function adminLogin() {
     return;
   }
   try {
+    var body = { username: username, password: password };
+    var keyInput = document.getElementById("admin-static-key");
+    var keyFields = document.getElementById("admin-key-fields");
+    if (keyInput && keyFields && !keyFields.classList.contains("hidden")) {
+      if (!keyInput.value) { errEl.textContent = "请输入静态密钥"; errEl.classList.remove("hidden"); return; }
+      body.static_key = keyInput.value.trim();
+    }
     var r = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: username, password: password })
+      body: JSON.stringify(body)
     });
     var data = await r.json();
-    if (!r.ok || data.user.role !== "admin") {
+    if (data.need_static_key) {
+      document.getElementById("admin-login-fields").classList.add("hidden");
+      document.getElementById("admin-key-fields").classList.remove("hidden");
+      document.getElementById("admin-login-btn").textContent = "验证密钥";
+      document.getElementById("admin-static-key").focus();
+      errEl.classList.add("hidden");
+      return;
+    }
+    if (!r.ok || (data.user.role !== "admin" && data.user.role !== "super_admin")) {
       errEl.textContent = data.error || "非管理员账号";
       errEl.classList.remove("hidden");
       return;
     }
     adminToken = data.token;
+    adminRole = data.user.role;
+    adminUserId = data.user.id;
     localStorage.setItem("peiwang_admin_token", adminToken);
     showAdminApp();
   } catch(e) {
@@ -76,6 +95,22 @@ function adminLogout() {
 // ======================== 管理功能 ========================
 // ======================== 全局变量 ========================
 var currentOrders = [];
+// ======================== 分页状态 ========================
+var PAGE_SIZE = 8;
+var ordersPage = 1;
+var menuPage = 1;
+var consumptionPage = 1;
+
+function renderPagination(total, page, pageSize, onPage) {
+  var totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (totalPages <= 1) return '';
+  var html = '<div class="pagination" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 0;">';
+  html += '<button class="btn btn-sm btn-default" onclick="' + onPage + '(' + (page-1) + ')"' + (page<=1?' disabled':'') + '>上一页</button>';
+  html += '<span style="font-size:13px;color:#666;">第 ' + page + ' / ' + totalPages + ' 页</span>';
+  html += '<button class="btn btn-sm btn-default" onclick="' + onPage + '(' + (page+1) + ')"' + (page>=totalPages?' disabled':'') + '>下一页</button>';
+  html += '</div>';
+  return html;
+}
 var currentMenuItems = [];
 var currentConsumption = [];
 var currentChatOrders = [];
@@ -97,6 +132,7 @@ function switchTab(tabName) {
   // 加载相应数据
   if (tabName === "users") loadUsers();
   else if (tabName === "settings") loadSettings();
+  else if (tabName === "admin-users") loadAdminUsers();
     else if (tabName === "categories") loadCategories();
     else if (tabName === "orders") loadOrders();
   else if (tabName === "menu") loadMenuItems();
@@ -106,7 +142,7 @@ function switchTab(tabName) {
 
 // ======================== API 工具 ========================
 async function apiGet(url) {
-  var r = await fetch(url);
+  var r = await fetch(url, { headers: { "Authorization": "Bearer " + adminToken } });
   if (!r.ok) throw new Error("请求失败");
   return r.json();
 }
@@ -114,7 +150,7 @@ async function apiGet(url) {
 async function apiPost(url, data) {
   var r = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + adminToken },
     body: JSON.stringify(data)
   });
   if (!r.ok) throw new Error("请求失败");
@@ -124,7 +160,7 @@ async function apiPost(url, data) {
 async function apiPut(url, data) {
   var r = await fetch(url, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + adminToken },
     body: JSON.stringify(data)
   });
   if (!r.ok) throw new Error("请求失败");
@@ -132,7 +168,7 @@ async function apiPut(url, data) {
 }
 
 async function apiDelete(url) {
-  var r = await fetch(url, { method: "DELETE" });
+  var r = await fetch(url, { method: "DELETE", headers: { "Authorization": "Bearer " + adminToken } });
   if (!r.ok) throw new Error("请求失败");
   return r.json();
 }
@@ -160,16 +196,18 @@ async function loadOrders() {
 function renderOrders() {
   var container = document.getElementById("order-table-container");
   if (!currentOrders || currentOrders.length === 0) {
-    container.innerHTML = "<div class='empty-state'>暂无订单</div>";
+    container.innerHTML = "<div class='empty-state'>" + "暂无订单" + "</div>";
     return;
   }
-
+  var total = currentOrders.length;
+  var start = (ordersPage - 1) * PAGE_SIZE;
+  var end = Math.min(start + PAGE_SIZE, total);
+  var pageData = currentOrders.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
   html += "<th>#</th><th>菜品</th><th>客户</th><th>联系</th><th>数量</th><th>金额</th><th>状态</th><th>备注</th><th>操作</th>";
   html += "</tr></thead><tbody>";
-
-  for (var i = 0; i < currentOrders.length; i++) {
-    var o = currentOrders[i];
+  for (var i = 0; i < pageData.length; i++) {
+    var o = pageData[i];
     html += "<tr>";
     html += "<td>" + o.id + "</td>";
     html += "<td>" + escapeHtml(o.menu_name || "未知") + "</td>";
@@ -180,22 +218,23 @@ function renderOrders() {
     html += "<td><span class='status-badge status-" + o.status + "'>" + statusLabel(o.status) + "</span></td>";
     html += "<td>" + escapeHtml(o.remark || "-") + "</td>";
     html += "<td class='action-btns'>";
-
     if (o.status === "pending") {
-      html += "<button class='btn btn-success btn-sm' onclick='confirmOrder(" + o.id + ")'>确认</button>";
-      html += "<button class='btn btn-warning btn-sm' onclick='cancelOrder(" + o.id + ")'>取消</button>";
+      html += "<button class='btn btn-success btn-sm' onclick='confirmOrder(" + o.id + ")'>" + "确认" + "</button>";
+      html += "<button class='btn btn-warning btn-sm' onclick='cancelOrder(" + o.id + ")'>" + "取消" + "</button>";
     }
     if (o.status === "confirmed") {
-      html += "<button class='btn btn-primary btn-sm' onclick='completeOrder(" + o.id + ")'>完成</button>";
+      html += "<button class='btn btn-primary btn-sm' onclick='completeOrder(" + o.id + ")'>" + "完成" + "</button>";
     }
-    html += "<button class='btn btn-danger btn-sm' onclick='deleteOrder(" + o.id + ")'>删除</button>";
-
+    html += "<button class='btn btn-danger btn-sm' onclick='deleteOrder(" + o.id + ")'>" + "删除" + "</button>";
     html += "</td></tr>";
   }
-
   html += "</tbody></table></div>";
+  html += "<div style='text-align:center;padding:8px 0;'><span style='font-size:13px;color:#999;'>共 " + total + " 条，显示 " + (start+1) + "-" + end + "</span></div>";
+  html += renderPagination(total, ordersPage, PAGE_SIZE, "goOrdersPage");
   container.innerHTML = html;
 }
+
+function goOrdersPage(p) { ordersPage = p; renderOrders(); }function goOrdersPage(p) { ordersPage = p; renderOrders(); }
 
 // 状态标签
 function statusLabel(s) {
@@ -242,22 +281,24 @@ async function loadMenuItems() {
 function renderMenuItems(cats) {
   var container = document.getElementById("menu-table-container");
   if (!currentMenuItems || currentMenuItems.length === 0) {
-    container.innerHTML = "<div class='empty-state'>暂无菜品，点击右上角新增</div>";
+    container.innerHTML = "<div class='empty-state'>" + "暂无菜品" + "，点击右上角新增</div>";
     return;
   }
-
   var catMap = {};
   for (var i = 0; i < cats.length; i++) catMap[cats[i].id] = cats[i].name;
-
+  var total = currentMenuItems.length;
+  var start = (menuPage - 1) * PAGE_SIZE;
+  var end = Math.min(start + PAGE_SIZE, total);
+  var pageData = currentMenuItems.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
   html += "<th>#</th><th>图片</th><th>名称</th><th>分类</th><th>价格</th><th>描述</th><th>状态</th><th>操作</th>";
   html += "</tr></thead><tbody>";
-
-  for (var i = 0; i < currentMenuItems.length; i++) {
-    var it = currentMenuItems[i];
+  for (var i = 0; i < pageData.length; i++) {
+    var it = pageData[i];
     html += "<tr>";
     html += "<td>" + it.id + "</td>";
-    html += "<td><img src='" + (it.image || "/uploads/default1.svg") + "' style='width:50px;height:50px;object-fit:cover;border-radius:4px;' onerror=\"this.src='/uploads/default1.svg'\"></td>";
+    var imgSrc = it.image || "/uploads/default1.svg";
+    html += '<td><img src=\u0022' + imgSrc + '\u0022 style=\u0022width:50px;height:50px;object-fit:cover;border-radius:4px;\u0022></td>';
     html += "<td>" + escapeHtml(it.name) + "</td>";
     html += "<td>" + (catMap[it.category_id] || "未知") + "</td>";
     html += "<td>¥" + it.price + "</td>";
@@ -268,10 +309,13 @@ function renderMenuItems(cats) {
     html += "<button class='btn btn-danger btn-sm' onclick='deleteMenuItem(" + it.id + ")'>删除</button>";
     html += "</td></tr>";
   }
-
   html += "</tbody></table></div>";
+  html += "<div style='text-align:center;padding:8px 0;'><span style='font-size:13px;color:#999;'>共 " + total + " 条，显示 " + (start+1) + "-" + end + "</span></div>";
+  html += renderPagination(total, menuPage, PAGE_SIZE, "goMenuPage");
   container.innerHTML = html;
 }
+
+function goMenuPage(p) { menuPage = p; loadMenuItems(); }function goMenuPage(p) { menuPage = p; loadMenuItems(); }
 
 function showAddMenuItem() {
   showAddEditForm(null);
@@ -509,16 +553,18 @@ async function loadConsumption() {
 function renderConsumption() {
   var container = document.getElementById("consumption-table-container");
   if (!currentConsumption || currentConsumption.length === 0) {
-    container.innerHTML = "<div class='empty-state'>暂无消费记录</div>";
+    container.innerHTML = "<div class='empty-state'>" + "暂无消费记录" + "</div>";
     return;
   }
-
+  var total = currentConsumption.length;
+  var start = (consumptionPage - 1) * PAGE_SIZE;
+  var end = Math.min(start + PAGE_SIZE, total);
+  var pageData = currentConsumption.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
   html += "<th>#</th><th>订单号</th><th>客户</th><th>服务</th><th>数量</th><th>金额</th><th>确认时间</th><th>操作</th>";
   html += "</tr></thead><tbody>";
-
-  for (var i = 0; i < currentConsumption.length; i++) {
-    var r = currentConsumption[i];
+  for (var i = 0; i < pageData.length; i++) {
+    var r = pageData[i];
     var time = r.confirmed_at ? new Date(r.confirmed_at).toLocaleString("zh-CN") : "-";
     html += "<tr>";
     html += "<td>" + r.id + "</td>";
@@ -531,10 +577,13 @@ function renderConsumption() {
     html += "<td><button class='btn btn-primary btn-sm' onclick='editConsumption(" + r.id + ")'>编辑</button> <button class='btn btn-danger btn-sm' onclick='deleteConsumption(" + r.id + ")'>删除</button></td>";
     html += "</tr>";
   }
-
   html += "</tbody></table></div>";
+  html += "<div style='text-align:center;padding:8px 0;'><span style='font-size:13px;color:#999;'>共 " + total + " 条，显示 " + (start+1) + "-" + end + "</span></div>";
+  html += renderPagination(total, consumptionPage, PAGE_SIZE, "goConsumptionPage");
   container.innerHTML = html;
 }
+
+function goConsumptionPage(p) { consumptionPage = p; renderConsumption(); }function goConsumptionPage(p) { consumptionPage = p; renderConsumption(); }
 
 
 // ======================== 消费记录增删改 ========================
@@ -644,53 +693,83 @@ async function loadSettings() {
   var container = document.getElementById('settings-container');
   try {
     var s = await apiGet('/api/settings');
-    var body = '';
-    body += '<div style="max-width:500px;">';
+    var body = '<div style="max-width:500px;">';
+
+    // 小店图片
     body += '<div style="margin-bottom:16px;">';
     body += '<label style="font-size:13px;color:#666;display:block;margin-bottom:4px;">小店图片</label>';
     body += '<div style="display:flex;align-items:center;gap:12px;">';
     body += '<div id="logo-preview" style="width:60px;height:60px;border-radius:8px;overflow:hidden;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:30px;background:#f9f9f9;">';
     if (s.site_logo_url) body += '<img src="' + escapeHtml(s.site_logo_url) + '" style="width:100%;height:100%;object-fit:cover;">';
     else body += escapeHtml(s.site_logo || '🐾');
-    body += '</div>';
-    body += '<div>';
+    body += '</div><div>';
     body += '<input type="file" id="logo-file-input" accept="image/*" style="display:none;" onchange="uploadLogo()">';
     body += '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'logo-file-input\').click()">上传图片</button>';
     body += '<button class="btn btn-sm btn-default" onclick="clearLogo()" style="margin-left:4px;">清除</button>';
-    body += '<div style="margin-top:4px;font-size:12px;color:#999;">支持 JPG/PNG/SVG</div>';
+    body += '<div style="margin-top:4px;font-size:12px;color:#999;">支持 JPG/PNG</div>';
     body += '</div></div></div>';
     body += '<input type="hidden" id="set-logo-url" value="' + escapeHtml(s.site_logo_url || '') + '">';
-    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">网站名称</label><input id="set-name" value="' + escapeHtml(s.site_name || '') + '" style="width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
-    
-    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">描述语</label><input id="set-desc" value="' + escapeHtml(s.site_description || '') + '" style="width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
-    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">背景视频</label>' +
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-      '<div id="video-preview" style="width:80px;height:50px;border-radius:6px;overflow:hidden;border:1px solid #ddd;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;">' + (s.site_video_url ? '✓' : '未设置') + '</div>' +
-      '<div><input type="file" id="video-file-input" accept="video/*" style="display:none;" onchange="uploadSiteVideo()">' +
-      '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'video-file-input\').click()">上传视频</button>' +
-      '<button class="btn btn-sm btn-default" onclick="clearSiteVideo()" style="margin-left:4px;">清除</button>' +
-      '<div style="margin-top:2px;font-size:11px;color:#999;">建议 MP4, < 20MB</div>' +
-      '</div></div></div>' +
-    '<input type="hidden" id="set-video-url" value="' + escapeHtml(s.site_video_url || '') + '">';
-    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">背景音乐</label>' +
-      '<div style="display:flex;align-items:center;gap:10px;">' +
-      '<div id="music-preview" style="width:80px;height:50px;border-radius:6px;overflow:hidden;border:1px solid #ddd;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;">' + (s.site_music_url ? '✓' : '未设置') + '</div>' +
-      '<div><input type="file" id="music-file-input" accept="audio/*" style="display:none;" onchange="uploadSiteMusic()">' +
-      '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'music-file-input\').click()">上传音乐</button>' +
-      '<button class="btn btn-sm btn-default" onclick="clearSiteMusic()" style="margin-left:4px;">清除</button>' +
-      '<div style="margin-top:2px;font-size:11px;color:#999;">建议 MP3/M4A</div>' +
-      '</div></div></div>' +
-    '<input type="hidden" id="set-music-url" value="' + escapeHtml(s.site_music_url || '') + '">';
+
+    // 网站名称
+    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">网站名称</label>';
+    body += '<input id="set-name" value="' + escapeHtml(s.site_name || '') + '" style="width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
+
+    // 描述语
+    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">描述语</label>';
+    body += '<input id="set-desc" value="' + escapeHtml(s.site_description || '') + '" style="width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
+
+    // 背景视频
+    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">背景视频</label>';
+    body += '<div style="display:flex;align-items:center;gap:10px;">';
+    body += '<div id="video-preview" style="width:80px;height:50px;border-radius:6px;overflow:hidden;border:1px solid #ddd;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;">';
+    body += (s.site_video_url ? '✓' : '未设置') + '</div>';
+    body += '<div><input type="file" id="video-file-input" accept="video/*" style="display:none;" onchange="uploadSiteVideo()">';
+    body += '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'video-file-input\').click()">上传视频</button>';
+    body += '<button class="btn btn-sm btn-default" onclick="clearSiteVideo()" style="margin-left:4px;">清除</button>';
+    body += '</div></div></div>';
+    body += '<input type="hidden" id="set-video-url" value="' + escapeHtml(s.site_video_url || '') + '">';
+
+    // 侧边栏背景图
+    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">侧边栏背景图</label>';
+    body += '<div style="display:flex;align-items:center;gap:10px;">';
+    body += '<div id="sidebar-bg-preview" style="width:60px;height:60px;border-radius:8px;overflow:hidden;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;background:#f9f9f9;">';
+    if (s.site_sidebar_bg) body += '<img src="' + escapeHtml(s.site_sidebar_bg) + '" style="width:100%;height:100%;object-fit:cover;">';
+    else body += '未设置';
+    body += '</div><div>';
+    body += '<input type="file" id="sidebar-bg-file-input" accept="image/*" style="display:none;" onchange="uploadSidebarBg()">';
+    body += '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'sidebar-bg-file-input\').click()">上传图片</button>';
+    body += '<button class="btn btn-sm btn-default" onclick="clearSidebarBg()" style="margin-left:4px;">清除</button>';
+    body += '</div></div></div>';
+    body += '<input type="hidden" id="set-sidebar-bg" value="' + escapeHtml(s.site_sidebar_bg || '') + '">';
+
+    // 登录背景图
+    body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">登录背景图</label>';
+    body += '<div style="display:flex;align-items:center;gap:10px;">';
+    body += '<div id="login-bg-preview" style="width:80px;height:50px;border-radius:6px;overflow:hidden;border:1px solid #ddd;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;">';
+    if (s.site_login_bg) body += '<img src="' + escapeHtml(s.site_login_bg) + '" style="width:100%;height:100%;object-fit:cover;">';
+    else body += '未设置';
+    body += '</div><div>';
+    body += '<input type="file" id="login-bg-file-input" accept="image/*" style="display:none;" onchange="uploadLoginBg()">';
+    body += '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'login-bg-file-input\').click()">上传图片</button>';
+    body += '<button class="btn btn-sm btn-default" onclick="clearLoginBg()" style="margin-left:4px;">清除</button>';
+    body += '</div></div></div>';
+    body += '<input type="hidden" id="set-login-bg" value="' + escapeHtml(s.site_login_bg || '') + '">';
+
+    // 静态密钥
+    body += '<div style="margin-bottom:16px;"><label style="font-size:13px;color:#666;display:block;margin-bottom:4px;">静态密钥（超级管理员异地登录验证）</label>';
+    body += '<input id="set-static-key" value="' + escapeHtml(s.static_key || "133900923@") + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
+
+    // 保存按钮
     body += '<div style="margin-top:16px;">';
     body += '<button class="btn btn-primary" onclick="saveSettings()">保存设置</button>';
     body += ' <span id="settings-status" style="color:#52c41a;margin-left:10px;font-size:13px;"></span>';
     body += '</div></div>';
+    
     container.innerHTML = body;
   } catch(e) {
     container.innerHTML = '<div class="empty-state">加载失败: ' + e.message + '</div>';
   }
 }
-
 
 
 
@@ -737,40 +816,25 @@ function clearSiteVideo() {
   document.getElementById('video-preview').innerHTML = '未设置';
 }
 
-async function uploadSiteMusic() {
-  var input = document.getElementById('music-file-input');
-  var file = input.files[0];
-  if (!file) return;
-  var fd = new FormData();
-  fd.append('image', file);
-  try {
-    var r = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + adminToken }, body: fd });
-    if (r.ok) {
-      var d = await r.json();
-      document.getElementById('set-music-url').value = d.url;
-      document.getElementById('music-preview').innerHTML = '✓';
-      notify('音乐已上传');
-    } else { notify('上传失败'); }
-  } catch(e) { notify('网络错误'); }
-  input.value = '';
-}
-
-function clearSiteMusic() {
-  document.getElementById('set-music-url').value = '';
-  document.getElementById('music-preview').innerHTML = '未设置';
+function clearLogo() {
+  document.getElementById('set-logo-url').value = '';
+  document.getElementById('logo-preview').innerHTML = '🐾';
 }
 
 function clearLogo() {
   document.getElementById('set-logo-url').value = '';
   document.getElementById('logo-preview').innerHTML = '🐾';
 }
+
 async function saveSettings() {
   var data = {
     site_logo_url: document.getElementById('set-logo-url').value,
     site_name: document.getElementById('set-name').value.trim(),
     site_description: document.getElementById('set-desc').value.trim(),
     site_video_url: document.getElementById('set-video-url').value,
-    site_music_url: document.getElementById('set-music-url').value
+    site_sidebar_bg: document.getElementById('set-sidebar-bg').value,
+    site_login_bg: document.getElementById('set-login-bg').value,
+    static_key: document.getElementById('set-static-key').value.trim()
   };
   try {
     var r = await fetch('/api/settings', {
@@ -790,3 +854,51 @@ async function saveSettings() {
     document.getElementById('settings-status').textContent = '❌ 网络错误';
   }
 }
+
+async function uploadLoginBg() {
+  var fileInput = document.getElementById('login-bg-file-input');
+  var file = fileInput.files[0];
+  if (!file) return;
+  var formData = new FormData();
+  formData.append('image', file);
+  try {
+    var r = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + adminToken }, body: formData });
+    if (r.ok) {
+      var data = await r.json();
+      document.getElementById('set-login-bg').value = data.url;
+      document.getElementById('login-bg-preview').innerHTML = '<img src="' + data.url + '" style="width:100%;height:100%;object-fit:cover;">';
+      notify('图片已上传');
+    } else { notify('上传失败'); }
+  } catch(e) { notify('网络错误'); }
+  fileInput.value = '';
+}
+
+function clearLoginBg() {
+  document.getElementById('set-login-bg').value = '';
+  document.getElementById('login-bg-preview').innerHTML = '未设置';
+}
+
+async function uploadSidebarBg() {
+  var fileInput = document.getElementById('sidebar-bg-file-input');
+  var file = fileInput.files[0];
+  if (!file) return;
+  var formData = new FormData();
+  formData.append('image', file);
+  try {
+    var r = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + adminToken }, body: formData });
+    if (r.ok) {
+      var data = await r.json();
+      document.getElementById('set-sidebar-bg').value = data.url;
+      document.getElementById('sidebar-bg-preview').innerHTML = '<img src="' + data.url + '" style="width:100%;height:100%;object-fit:cover;">';
+      notify('图片已上传');
+    } else { notify('上传失败'); }
+  } catch(e) { notify('网络错误'); }
+  fileInput.value = '';
+}
+
+function clearSidebarBg() {
+  document.getElementById('set-sidebar-bg').value = '';
+  document.getElementById('sidebar-bg-preview').innerHTML = '未设置';
+}
+
+function closeForm(id){var el=document.getElementById(id);if(el)el.remove();}

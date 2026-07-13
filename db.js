@@ -1,4 +1,4 @@
-﻿const crypto = require("crypto");
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const DIR = __dirname;
@@ -92,6 +92,33 @@ function seedData() {
 
 
 function initJSON() {
+  // If DATA_DIR differs from project dir, copy seed data on first run
+  var projectData = path.join(DIR, "data.json");
+  if (DATA_DIR !== DIR && !fs.existsSync(DATA_FILE) && fs.existsSync(projectData)) {
+    try {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      fs.copyFileSync(projectData, DATA_FILE);
+      var projUp = path.join(DIR, "uploads");
+      if (fs.existsSync(projUp)) {
+        var tgtUp = path.join(DATA_DIR, "uploads");
+        if (!fs.existsSync(tgtUp)) {
+          function cpDir(s, d) {
+            fs.mkdirSync(d, { recursive: true });
+            fs.readdirSync(s).forEach(function(f) {
+              var sp = path.join(s, f), dp = path.join(d, f);
+              if (fs.statSync(sp).isDirectory()) cpDir(sp, dp);
+              else fs.copyFileSync(sp, dp);
+            });
+          }
+          cpDir(projUp, tgtUp);
+        }
+      }
+      console.log("已从项目目录复制种子数据到持久化目录");
+    } catch(e) {
+      console.error("复制种子数据失败:", e.message);
+    }
+  }
+
   if (!fs.existsSync(DATA_FILE)) {
     const defaultData = {
       categories: [
@@ -285,11 +312,11 @@ function getConsumptionRecords() {
 // ====================== 用户系统 ======================
 
 function createUser(username, password, email, role) {
-  var hash = crypto.createHash('sha256').update(password).digest('hex');
+  var hash = crypto.scryptSync(password, 'peiwang-salt-2024', 32).toString('hex');
   if (SQLite) {
     try {
       var r = db.prepare('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)').run(username, hash, email || '', role || 'customer');
-      var u = db.prepare('SELECT id, username, email, role, created_at FROM users WHERE id = ?').get(r.lastInsertRowid);
+      var u = db.prepare('SELECT id, username, email, role, created_at, last_login_ip FROM users WHERE id = ?').get(r.lastInsertRowid);
       return u;
     } catch(e) {
       if (e.message.indexOf('UNIQUE') >= 0) return null;
@@ -298,7 +325,7 @@ function createUser(username, password, email, role) {
   }
   var d = getJSON();
   if (d.users.find(function(u) { return u.username === username; })) return null;
-  var user = { id: nextId('user'), username: username, password: hash, email: email || '', role: role || 'customer', created_at: new Date().toISOString() };
+  var user = { id: nextId('user'), username: username, password: hash, email: email || '', role: role || 'customer', created_at: new Date().toISOString(), last_login_ip: '' };
   d.users.push(user); saveJSON();
   return { id: user.id, username: user.username, email: user.email, role: user.role, created_at: user.created_at };
 }
@@ -312,11 +339,11 @@ function getUserById(id) {
   if (SQLite) return db.prepare('SELECT id, username, email, role, created_at FROM users WHERE id = ?').get(id);
   var u = getJSON().users.find(function(u2) { return u2.id === id; });
   if (!u) return null;
-  return { id: u.id, username: u.username, email: u.email, role: u.role, created_at: u.created_at };
+  return { id: u.id, username: u.username, email: u.email, role: u.role, created_at: u.created_at, last_login_ip: u.last_login_ip || null };
 }
 
 function verifyPassword(plain, hashed) {
-  return crypto.createHash('sha256').update(plain).digest('hex') === hashed;
+  try { return crypto.scryptSync(plain, 'peiwang-salt-2024', 32).toString('hex') === hashed; } catch(e) { return false; }
 }
 
 function initUsers() {
@@ -337,7 +364,7 @@ function initUsers() {
 }
 
 if (SQLite) {
-  db.exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, email TEXT DEFAULT "", role TEXT DEFAULT "customer", created_at TEXT DEFAULT (datetime("now")))');
+  db.exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, email TEXT DEFAULT "", role TEXT DEFAULT "customer", created_at TEXT DEFAULT (datetime("now")), last_login_ip TEXT DEFAULT "")');
   initUsers();
 } else {
   (function ensureNextId() {
@@ -354,6 +381,7 @@ function updateUser(id, fields) {
     var sets = []; var vals = [];
     if (fields.username) { sets.push('username = ?'); vals.push(fields.username); }
     if (fields.email !== undefined) { sets.push('email = ?'); vals.push(fields.email); }
+    if (fields.role !== undefined) { sets.push('role = ?'); vals.push(fields.role); }
     if (fields.password) { var h = crypto.createHash('sha256').update(fields.password).digest('hex'); sets.push('password = ?'); vals.push(h); }
     if (sets.length === 0) return null;
     vals.push(id);
@@ -365,6 +393,7 @@ function updateUser(id, fields) {
   if (idx < 0) return null;
   if (fields.username) d.users[idx].username = fields.username;
   if (fields.email !== undefined) d.users[idx].email = fields.email;
+  if (fields.role !== undefined) d.users[idx].role = fields.role;
   if (fields.password) d.users[idx].password = crypto.createHash('sha256').update(fields.password).digest('hex');
   saveJSON();
   return { id: d.users[idx].id, username: d.users[idx].username, email: d.users[idx].email, role: d.users[idx].role, created_at: d.users[idx].created_at };
@@ -378,7 +407,7 @@ function deleteUser(id) {
 }
 
 function getAllUsers() {
-  if (SQLite) return db.prepare('SELECT id, username, email, role, created_at FROM users ORDER BY id').all();
+  if (SQLite) return db.prepare('SELECT id, username, email, role, created_at, last_login_ip FROM users ORDER BY id').all();
   return (getJSON().users || []).map(function(u) { return { id: u.id, username: u.username, email: u.email, role: u.role, created_at: u.created_at }; });
 }
 
@@ -461,4 +490,29 @@ function deleteConsumptionRecord(id) {
 
 function clearJSONCache() { jsonData = null; }
 
-module.exports = { engine, getCategories, getMenuItems, getMenuItem, createMenuItem, updateMenuItem, deleteMenuItem, createOrder, getOrders, updateOrderStatus, deleteOrder, getChatMessages, addChatMessage, getConsumptionRecords, createConsumptionRecord, updateConsumptionRecord, deleteConsumptionRecord, createUser, getUserByUsername, getUserById, verifyPassword, updateUser, deleteUser, getAllUsers , updateCategory , updateCategoryImage , clearJSONCache };
+function getUserLastIP(id) {
+  if (SQLite) {
+    try { var r = db.prepare("SELECT last_login_ip FROM users WHERE id = ?").get(id); return r ? r.last_login_ip : null; } catch(e) { return null; }
+  }
+  var d = getJSON();
+  var u = d.users.find(function(u2) { return u2.id === id; });
+  return u ? (u.last_login_ip || null) : null;
+}
+
+function updateUserLastIP(id, ip) {
+  if (SQLite) {
+    try { db.prepare("UPDATE users SET last_login_ip = ? WHERE id = ?").run(ip, id); } catch(e) {}
+  } else {
+    try {
+      var d = JSON.parse(require("fs").readFileSync(path.join(DATA_DIR, "data.json"), "utf8"));
+      var users = d.users || [];
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].id === id) { users[i].last_login_ip = ip; break; }
+      }
+      d.users = users;
+      require("fs").writeFileSync(path.join(DATA_DIR, "data.json"), JSON.stringify(d, null, 2), "utf8");
+    } catch(e) {}
+  }
+}
+
+module.exports = { engine, getCategories, getMenuItems, getMenuItem, createMenuItem, updateMenuItem, deleteMenuItem, createOrder, getOrders, updateOrderStatus, deleteOrder, getChatMessages, addChatMessage, getConsumptionRecords, createConsumptionRecord, updateConsumptionRecord, deleteConsumptionRecord, createUser, getUserByUsername, getUserById, verifyPassword, updateUser, deleteUser, getAllUsers, updateCategory, updateCategoryImage, clearJSONCache, getUserLastIP, updateUserLastIP };

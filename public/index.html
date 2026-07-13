@@ -4,10 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>陪玩店 - 欢迎光临</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=3">
 </head>
 <body>
-  <div id="video-bg"><video id="bg-video" src="/video/bg.mp4" muted loop autoplay playsinline></video></div>
+<div id="lockscreen">
+  <div id="lockscreen-video-wrap">
+    <video id="lockscreen-video" muted playsinline></video>
+  </div>
+  <div id="lockscreen-overlay"></div>
+  <div id="lockscreen-content">
+    <div class="lock-time" id="lock-time"></div>
+    <div class="lock-date" id="lock-date"></div>
+    <div class="lock-hint" id="lock-hint">
+      <span class="lock-arrow">⬆</span>
+      <span>上滑解锁</span>
+    </div>
+  </div>
+</div>
+  <div id="video-bg"><video id="bg-video" src="/video/bg.mp4" muted loop playsinline></video></div>
   <div id="video-overlay"></div>
   <div id="app">
     <!-- 左侧边栏 -->
@@ -132,9 +146,6 @@
   <script src="/js/api.js"></script>
   <script src="/js/chat.js"></script>
   <script src="/js/app.js"></script>
-  <audio id="bgm-audio" src="/music/bgm.m4a" loop preload="auto"></audio>
-  <div id="music-player">
-    <button id="music-toggle" onclick="toggleMusic()" title="背景音乐开关">🎵</button>
-  </div>
+  
 </body>
 </html>
