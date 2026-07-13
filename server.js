@@ -265,7 +265,7 @@ async function handleAPI(req, res) {
     if (u.pathname === "/api/orders" && method === "GET") {
       var au = getAuthUser(req);
       var userId = null;
-      if (au && au.role !== "admin") userId = au.id;
+      if (au && au.role !== "admin" && au.role !== "super_admin") userId = au.id;
       return json(db.getOrders(u.searchParams.get("status"), userId));
     }
 
