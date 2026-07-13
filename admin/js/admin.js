@@ -674,8 +674,24 @@ function notify(msg) {
   evtSource.addEventListener("order_update", function() {
     if (document.getElementById("tab-orders").classList.contains("active")) loadOrders();
   });
-  evtSource.addEventListener("chat_message", function() {
-    if (document.getElementById("tab-chat").classList.contains("active")) loadChatList();
+  evtSource.addEventListener("chat_message", function(e) {
+    var d = JSON.parse(e.data);
+    if (document.getElementById("tab-chat").classList.contains("active")) {
+      loadChatList();
+      if (d && d.sender === "customer" && adminChatOrderId === d.order_id) {
+        var el = document.getElementById("admin-chat-msgs");
+        if (el) {
+          var p = document.createElement("p");
+          if (d.image) {
+            p.innerHTML = "<b>客户:</b><br><img src=\"" + d.image + "\" style=\"max-width:200px;max-height:200px;border-radius:8px;margin-top:4px;cursor:pointer;\" onclick=\"window.open(this.src)\">";
+          } else {
+            p.innerHTML = "<b>客户:</b> " + escapeHtml(d.message);
+          }
+          el.appendChild(p);
+          el.scrollTop = el.scrollHeight;
+        }
+      }
+    }
   });
   evtSource.addEventListener("menu_update", function() {
     if (document.getElementById("tab-menu").classList.contains("active")) loadMenuItems();
