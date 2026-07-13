@@ -1,0 +1,14 @@
+﻿node_modules/
+npm-debug.log*
+.git/
+.gitignore
+*.md
+fix_*.js
+fix_*.py
+test_*.js
+out.txt
+err.txt
+std*.txt
+server_from_origin.js
+server.js.bak
+*.pyc
