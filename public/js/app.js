@@ -179,7 +179,7 @@ function renderMenuGrid(items) {
 
     var price = document.createElement("div");
     price.className = "price";
-    price.textContent = "点数" + it.price;
+    price.textContent = "MT" + it.price;
     body.appendChild(price);
 
     var desc = document.createElement("div");
@@ -210,7 +210,7 @@ async function showDetail(itemId) {
 
   var price = document.createElement("div");
   price.className = "price";
-  price.textContent = "点数" + it.price;
+  price.textContent = "MT" + it.price;
   el.appendChild(price);
 
   var desc = document.createElement("p");
@@ -330,7 +330,7 @@ async function showCart() {
     card.appendChild(h4);
 
     var p1 = document.createElement("p");
-    p1.textContent = "订单 #" + o.id + " | 点数" + o.total_price + " | " + o.customer_name;
+    p1.textContent = "订单 #" + o.id + " | MT" + o.total_price + " | " + o.customer_name;
     card.appendChild(p1);
 
     var statusSpan = document.createElement("span");

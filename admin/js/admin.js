@@ -204,7 +204,7 @@ function renderOrders() {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentOrders.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>菜品</th><th>客户</th><th>联系</th><th>数量</th><th>点数</th><th>状态</th><th>备注</th><th>操作</th>";
+  html += "<th>#</th><th>菜品</th><th>客户</th><th>联系</th><th>数量</th><th>MT</th><th>状态</th><th>备注</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var o = pageData[i];
@@ -291,7 +291,7 @@ function renderMenuItems(cats) {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentMenuItems.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>图片</th><th>名称</th><th>分类</th><th>点数</th><th>描述</th><th>状态</th><th>操作</th>";
+  html += "<th>#</th><th>图片</th><th>名称</th><th>分类</th><th>MT</th><th>描述</th><th>状态</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var it = pageData[i];
@@ -345,7 +345,7 @@ async function showAddEditForm(id) {
   var body = "";
   body += "<label><span>分类</span><select id='mi-category'>" + catOptions + "</select></label>";
   body += "<label><span>名称</span><input id='mi-name' value='" + (item ? escapeHtml(item.name) : "") + "'></label>";
-  body += "<label><span>点数</span><input id='mi-price' type='number' step='0.01' value='" + (item ? item.price : "") + "'></label>";
+  body += "<label><span>MT</span><input id='mi-price' type='number' step='0.01' value='" + (item ? item.price : "") + "'></label>";
   body += "<label><span>描述</span><textarea id='mi-desc'>" + (item ? escapeHtml(item.description || "") : "") + "</textarea></label>";
   body += "<div style='margin-bottom:14px;'><label style='display:block;font-size:13px;color:#666;margin-bottom:4px;'>项目图片</label>" +
     "<div style='display:flex;align-items:center;gap:10px;'>" +
@@ -561,7 +561,7 @@ function renderConsumption() {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentConsumption.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>咨询号</th><th>客户</th><th>服务</th><th>数量</th><th>点数</th><th>确认时间</th><th>操作</th>";
+  html += "<th>#</th><th>咨询号</th><th>客户</th><th>服务</th><th>数量</th><th>MT</th><th>确认时间</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var r = pageData[i];
@@ -595,7 +595,7 @@ function showAddConsumption() {
   body += "<label><span>客户名称</span><input id='cr-customer' value=''></label>";
   body += "<label><span>服务项目</span><input id='cr-service' value=''></label>";
   body += "<label><span>数量</span><input id='cr-qty' type='number' value='1'></label>";
-  body += "<label><span>点数</span><input id='cr-price' type='number' step='0.01' value='0'></label>";
+  body += "<label><span>MT</span><input id='cr-price' type='number' step='0.01' value='0'></label>";
   body += "<button class='btn btn-primary' onclick='saveConsumption()'>保存</button>";
   body += "<button class='btn btn-default' onclick='closeModal()'>取消</button>";
   showModal("新增咨询记录", body);
@@ -612,7 +612,7 @@ function editConsumption(id) {
   body += "<label><span>客户名称</span><input id='cr-customer' value='" + escapeHtml(r.customer_name) + "'></label>";
   body += "<label><span>服务项目</span><input id='cr-service' value='" + escapeHtml(r.menu_item_name) + "'></label>";
   body += "<label><span>数量</span><input id='cr-qty' type='number' value='" + r.quantity + "'></label>";
-  body += "<label><span>点数</span><input id='cr-price' type='number' step='0.01' value='" + r.total_price + "'></label>";
+  body += "<label><span>MT</span><input id='cr-price' type='number' step='0.01' value='" + r.total_price + "'></label>";
   body += "<button class='btn btn-primary' onclick='saveConsumption()'>保存</button>";
   body += "<button class='btn btn-default' onclick='closeModal()'>取消</button>";
   showModal("编辑咨询记录 #" + id, body);

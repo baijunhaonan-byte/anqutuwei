@@ -1,4 +1,4 @@
-﻿// ======================== 用户管理 ========================
+// ======================== 用户管理 ========================
 function escapeHtml(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
