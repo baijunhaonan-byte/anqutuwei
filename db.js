@@ -78,16 +78,16 @@ function initSQLite() {
 
 function seedData() {
   const insertCat = db.prepare("INSERT INTO categories (name, icon, sort_order) VALUES (?, ?, ?)");
-  insertCat.run("护航", "🛡️", 1);
-  insertCat.run("陪玩", "🎃", 2);
+  insertCat.run("游戏攻略", "🛡️", 1);
+  insertCat.run("玩家社区", "🎃", 2);
   insertCat.run("趣味单", "🎆", 3);
-  insertCat.run("代肝", "💎", 4);
+  insertCat.run("效率工具", "💎", 4);
 
   const insertItem = db.prepare("INSERT INTO menu_items (category_id, name, price, description, image) VALUES (?, ?, ?, ?, ?)");
   insertItem.run(1, "王者上分", 50, "专业王者上分服务，安全稳定不掉星", "/uploads/default1.svg");
-  insertItem.run(2, "吃鸡陪玩", 30, "绝地求生吃鸡陪玩，带你躺赢", "/uploads/default2.svg");
+  insertItem.run(2, "吃鸡组队", 30, "绝地求生吃鸡组队，高效配合", "/uploads/default2.svg");
   insertItem.run(3, "娱乐模式", 20, "各种趣味娱乐模式，开心就好", "/uploads/default3.svg");
-  insertItem.run(4, "原神代肝", 40, "原神日常委托、体力清理，安全高效", "/uploads/default4.svg");
+  insertItem.run(4, "原神攻略", 40, "原神日常委托攻略，全面讲解", "/uploads/default4.svg");
 }
 
 
@@ -122,16 +122,16 @@ function initJSON() {
   if (!fs.existsSync(DATA_FILE)) {
     const defaultData = {
       categories: [
-        { id: 1, name: "护航", icon: "🛡️", sort_order: 1 },
-        { id: 2, name: "陪玩", icon: "🎃", sort_order: 2 },
+        { id: 1, name: "游戏攻略", icon: "🛡️", sort_order: 1 },
+        { id: 2, name: "玩家社区", icon: "🎃", sort_order: 2 },
         { id: 3, name: "趣味单", icon: "🎆", sort_order: 3 },
-        { id: 4, name: "代肝", icon: "💎", sort_order: 4 }
+        { id: 4, name: "效率工具", icon: "💎", sort_order: 4 }
       ],
       menu_items: [
         { id: 1, category_id: 1, name: "王者上分", price: 50, description: "专业王者上分服务，安全稳定不掉星", image: "/uploads/default1.svg", is_available: 1 },
-        { id: 2, category_id: 2, name: "吃鸡陪玩", price: 30, description: "绝地求生吃鸡陪玩，带你躺赢", image: "/uploads/default2.svg", is_available: 1 },
+        { id: 2, category_id: 2, name: "吃鸡组队", price: 30, description: "绝地求生吃鸡组队，高效配合", image: "/uploads/default2.svg", is_available: 1 },
         { id: 3, category_id: 3, name: "娱乐模式", price: 20, description: "各种趣味娱乐模式，开心就好", image: "/uploads/default3.svg", is_available: 1 },
-        { id: 4, category_id: 4, name: "原神代肝", price: 40, description: "原神日常委托、体力清理，安全高效", image: "/uploads/default4.svg", is_available: 1 }
+        { id: 4, category_id: 4, name: "原神攻略", price: 40, description: "原神日常委托攻略，全面讲解", image: "/uploads/default4.svg", is_available: 1 }
       ],
       orders: [],
       chat_messages: [],

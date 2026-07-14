@@ -1,7 +1,7 @@
 {
   "name": "peiwang-store",
   "version": "1.0.0",
-  "description": "陪玩店网站 - 游戏护航/陪玩/代肝服务平台",
+  "description": "游戏社区 - 组队开黑与攻略分享",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

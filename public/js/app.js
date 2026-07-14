@@ -179,7 +179,7 @@ function renderMenuGrid(items) {
 
     var price = document.createElement("div");
     price.className = "price";
-    price.textContent = "积分" + it.price;
+    price.textContent = "点数" + it.price;
     body.appendChild(price);
 
     var desc = document.createElement("div");
@@ -210,7 +210,7 @@ async function showDetail(itemId) {
 
   var price = document.createElement("div");
   price.className = "price";
-  price.textContent = "积分" + it.price;
+  price.textContent = "点数" + it.price;
   el.appendChild(price);
 
   var desc = document.createElement("p");
@@ -220,7 +220,7 @@ async function showDetail(itemId) {
   var hr = document.createElement("hr");
   el.appendChild(hr);
 
-  // 下单表单
+  // 提交表单
   var form = document.createElement("div");
 
   // 数量
@@ -270,9 +270,9 @@ async function showDetail(itemId) {
   remarkLabel.appendChild(remarkTA);
   form.appendChild(remarkLabel);
 
-  // 下单按钮
+  // 提交按钮
   var orderBtn = document.createElement("button");
-  orderBtn.textContent = "立即下单";
+  orderBtn.textContent = "立即提交";
   orderBtn.onclick = function() { submitOrder(itemId, it.price); };
   form.appendChild(orderBtn);
 
@@ -296,14 +296,14 @@ async function submitOrder(itemId, price) {
       remark: remark
     });
 
-    notify("提交成功！咨询 #" + order.id + "，金额" + (price * qty));
+    notify("提交成功！咨询 #" + order.id + "，数量" + (price * qty));
 
     // 不再自动发送消息
     // 已移除自动消息
 
     setTimeout(function() { showHome(); }, 1500);
   } catch (e) {
-    notify("下单失败: " + e.message);
+    notify("提交失败: " + e.message);
   }
 }
 
@@ -330,7 +330,7 @@ async function showCart() {
     card.appendChild(h4);
 
     var p1 = document.createElement("p");
-    p1.textContent = "订单 #" + o.id + " | 积分" + o.total_price + " | " + o.customer_name;
+    p1.textContent = "订单 #" + o.id + " | 点数" + o.total_price + " | " + o.customer_name;
     card.appendChild(p1);
 
     var statusSpan = document.createElement("span");
