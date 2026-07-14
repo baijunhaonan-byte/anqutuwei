@@ -33,128 +33,155 @@
     {
       "id": 1,
       "category_id": 1,
-      "name": "新手入门指南",
-      "description": "快速上手基础操作与技巧",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "name": "暗区战术指导",
+      "price": 68,
+      "description": "68积分 · 新手特训方案",
+      "image": "/uploads/1783928553289-da97c46a.jpg",
+      "is_available": 1
     },
     {
       "id": 2,
       "category_id": 1,
-      "name": "进阶上分攻略",
-      "description": "提升胜率的战术思路",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "name": "暗区战术指导",
+      "price": 128,
+      "description": "128积分 · 进阶战术包",
+      "image": "/uploads/1783928561299-2b986612.jpg",
+      "is_available": 1
     },
     {
       "id": 3,
       "category_id": 1,
-      "name": "地图点位解析",
-      "description": "各大地图关键位置详解",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "name": "暗区战术指导",
+      "price": 198,
+      "description": "198积分 · 高级战术合集",
+      "image": "/uploads/1783928567085-17ff7d62.jpg",
+      "is_available": 1
     },
     {
       "id": 4,
       "category_id": 1,
-      "name": "装备搭配推荐",
-      "description": "不同场景最佳装备组合",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "name": "暗区战术指导",
+      "price": 258,
+      "description": "258积分 · 精英战术方案",
+      "image": "/uploads/1783928573436-9bc13e02.jpg",
+      "is_available": 1
     },
     {
       "id": 5,
-      "category_id": 2,
-      "name": "热门讨论话题",
-      "description": "玩家正在热议的内容",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "暗区战术指导",
+      "price": 378,
+      "description": "378积分 · 大师战术指导",
+      "image": "/uploads/1783928580199-22bfdd52.jpg",
+      "is_available": 1
     },
     {
       "id": 6,
-      "category_id": 2,
-      "name": "组队招募专区",
-      "description": "寻找志同道合的队友",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "暗区战术指导",
+      "price": 520,
+      "description": "520积分 · 传说战术全解",
+      "image": "/uploads/1783928586103-d1b4375f.jpg",
+      "is_available": 1
     },
     {
       "id": 7,
-      "category_id": 2,
-      "name": "精彩视频分享",
-      "description": "玩家高光时刻合集",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "暗区战术指导",
+      "price": 688,
+      "description": "688积分 · 巅峰战术秘籍",
+      "image": "/uploads/1783928592951-f6f82e5d.jpg",
+      "is_available": 1
     },
     {
       "id": 8,
-      "category_id": 2,
-      "name": "新手问答专区",
-      "description": "老玩家在线解答疑惑",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "至尊攻略合集",
+      "price": 98,
+      "description": "98积分 · 精品攻略大礼包",
+      "image": "/uploads/1783928927017-ee01eb3e.jpg",
+      "is_available": 1
     },
     {
       "id": 9,
-      "category_id": 3,
-      "name": "搞笑游戏瞬间",
-      "description": "欢乐时刻大集合",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "至尊攻略合集",
+      "price": 158,
+      "description": "158积分 · 高级攻略合辑",
+      "image": "/uploads/1783928956492-ee84e52e.jpg",
+      "is_available": 1
     },
     {
       "id": 10,
-      "category_id": 3,
-      "name": "创意玩法分享",
-      "description": "玩家自制的趣味玩法",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 1,
+      "name": "至尊攻略合集",
+      "price": 259,
+      "description": "259积分 · 大师攻略宝典",
+      "image": "/uploads/1783928962300-4906b712.jpg",
+      "is_available": 1
     },
     {
       "id": 11,
-      "category_id": 3,
-      "name": "赛事精彩回顾",
-      "description": "经典比赛复盘解析",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 2,
+      "name": "社区娱乐陪伴",
+      "price": 58,
+      "description": "58积分/小时 · 轻松娱乐时光",
+      "image": "/uploads/1783929550433-8a0146d7.jpg",
+      "is_available": 1
     },
     {
       "id": 12,
-      "category_id": 4,
-      "name": "战绩查询工具",
-      "description": "快速查询游戏数据",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 2,
+      "name": "技术交流指导",
+      "price": 68,
+      "description": "68积分/小时 · 专业技术分享",
+      "image": "/uploads/1783929574051-4155ae58.jpg",
+      "is_available": 1
     },
     {
       "id": 13,
-      "category_id": 4,
-      "name": "模拟器推荐",
-      "description": "流畅运行配置建议",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "category_id": 2,
+      "name": "游戏互助陪伴",
+      "price": 48,
+      "description": "48积分/小时 · 互帮互助共同进步",
+      "image": "/uploads/1783929588052-7d52d881.jpg",
+      "is_available": 1
     },
     {
       "id": 14,
       "category_id": 4,
-      "name": "录屏教程",
-      "description": "录制精彩瞬间的方法",
-      "image": "",
-      "is_available": 1,
-      "price": 0
+      "name": "批量处理工具A",
+      "price": 358,
+      "description": "358积分 · 60次批量+加急(1-3天)",
+      "image": "/uploads/1783929772889-3cd50ece.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 15,
+      "category_id": 4,
+      "name": "批量处理工具B",
+      "price": 308,
+      "description": "308积分 · 60次批量(3-5天)",
+      "image": "/uploads/1783929790271-224ab252.webp",
+      "is_available": 1
+    },
+    {
+      "id": 16,
+      "category_id": 4,
+      "name": "快速处理工具",
+      "price": 318,
+      "description": "318积分 · 6次快速+加急(1-3天)",
+      "image": "/uploads/1783929802415-7a99094f.webp",
+      "is_available": 1
+    },
+    {
+      "id": 17,
+      "category_id": 4,
+      "name": "常规处理工具",
+      "price": 288,
+      "description": "288积分 · 60次常规处理(3-5天)",
+      "image": "/uploads/1783929810341-7073e5df.jpg",
+      "is_available": 1
     }
   ],
   "orders": [],
