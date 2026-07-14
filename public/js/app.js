@@ -1,4 +1,4 @@
-﻿// ======================== 全局变量 ========================
+// ======================== 全局变量 ========================
 var categories = [];
 var currentCategoryId = null;
 var orders = [];
@@ -298,8 +298,8 @@ async function submitOrder(itemId, price) {
 
     notify("提交成功！咨询 #" + order.id + "，金额" + (price * qty));
 
-    // 发送一条聊天消息给客服
-    await sendChatMessage(order.id, "customer", "你好，我下单了" + (order.menu_name || "菜品") + "，请确认！");
+    // 不再自动发送消息
+    // 已移除自动消息
 
     setTimeout(function() { showHome(); }, 1500);
   } catch (e) {
