@@ -214,7 +214,7 @@ function renderOrders() {
     html += "<td>" + escapeHtml(o.customer_name) + "</td>";
     html += "<td>" + escapeHtml(o.customer_contact) + "</td>";
     html += "<td>" + o.quantity + "</td>";
-    html += "<td>¥" + o.total_price + "</td>";
+    html += "<td>" + o.total_price + "</td>";
     html += "<td><span class='status-badge status-" + o.status + "'>" + statusLabel(o.status) + "</span></td>";
     html += "<td>" + escapeHtml(o.remark || "-") + "</td>";
     html += "<td class='action-btns'>";
@@ -301,7 +301,7 @@ function renderMenuItems(cats) {
     html += '<td><img src=\u0022' + imgSrc + '\u0022 style=\u0022width:50px;height:50px;object-fit:cover;border-radius:4px;\u0022></td>';
     html += "<td>" + escapeHtml(it.name) + "</td>";
     html += "<td>" + (catMap[it.category_id] || "未知") + "</td>";
-    html += "<td>¥" + it.price + "</td>";
+    html += "<td>" + it.price + "</td>";
     html += "<td>" + escapeHtml(it.description || "") + "</td>";
     html += "<td>" + (it.is_available ? "上架" : "下架") + "</td>";
     html += "<td class='action-btns'>";
@@ -438,7 +438,7 @@ async function loadChatList() {
     html += "<div class='chat-order-card' onclick='showAdminChat(" + o.id + ")'>";
     html += "<h4>咨询 #" + o.id + " - " + escapeHtml(o.menu_name || "未知") + "</h4>";
     html += "<p>客户: " + escapeHtml(o.customer_name) + " | " + escapeHtml(o.customer_contact || "无联系方式") + "</p>";
-    html += "<p>数量: ¥" + o.total_price + " | 状态: <span class='status-badge status-" + o.status + "'>" + statusLabel(o.status) + "</span></p>";
+    html += "<p>数量: " + o.total_price + " | 状态: <span class='status-badge status-" + o.status + "'>" + statusLabel(o.status) + "</span></p>";
     html += "</div>";
   }
   html += "</div>";
@@ -572,7 +572,7 @@ function renderConsumption() {
     html += "<td>" + escapeHtml(r.customer_name) + "</td>";
     html += "<td>" + escapeHtml(r.menu_item_name) + "</td>";
     html += "<td>" + r.quantity + "</td>";
-    html += "<td>¥" + r.total_price + "</td>";
+    html += "<td>" + r.total_price + "</td>";
     html += "<td>" + time + "</td>";
     html += "<td><button class='btn btn-primary btn-sm' onclick='editConsumption(" + r.id + ")'>编辑</button> <button class='btn btn-danger btn-sm' onclick='deleteConsumption(" + r.id + ")'>删除</button></td>";
     html += "</tr>";
