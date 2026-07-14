@@ -771,9 +771,11 @@ async function loadSettings() {
     body += '</div></div></div>';
     body += '<input type="hidden" id="set-login-bg" value="' + escapeHtml(s.site_login_bg || '') + '">';
 
-    // 静态密钥
-    body += '<div style="margin-bottom:16px;"><label style="font-size:13px;color:#666;display:block;margin-bottom:4px;">静态密钥（超级管理员异地登录验证）</label>';
-    body += '<input id="set-static-key" value="' + escapeHtml(s.static_key || "133900923@") + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
+    // 静态密钥（仅超级管理员可见）
+    if (adminRole === "super_admin") {
+      body += '<div style="margin-bottom:16px;"><label style="font-size:13px;color:#666;display:block;margin-bottom:4px;">静态密钥（超级管理员异地登录验证）</label>';
+      body += '<input id="set-static-key" value="' + escapeHtml(s.static_key || "133900923@") + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px;"></div>';
+    }
 
     // 保存按钮
     body += '<div style="margin-top:16px;">';
@@ -850,7 +852,7 @@ async function saveSettings() {
     site_video_url: document.getElementById('set-video-url').value,
     site_sidebar_bg: document.getElementById('set-sidebar-bg').value,
     site_login_bg: document.getElementById('set-login-bg').value,
-    static_key: document.getElementById('set-static-key').value.trim()
+    static_key: adminRole === "super_admin" && document.getElementById('set-static-key') ? document.getElementById('set-static-key').value.trim() : ''
   };
   try {
     var r = await fetch('/api/settings', {
