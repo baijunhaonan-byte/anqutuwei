@@ -35,7 +35,7 @@
       "category_id": 1,
       "name": "开黑车队 初级席位",
       "price": 0,
-      "description": "68积分 · 快速上车 高效组队",
+      "description": "快速上车 高效组队",
       "image": "/uploads/1783928553289-da97c46a.jpg",
       "is_available": 1
     },
@@ -44,7 +44,7 @@
       "category_id": 1,
       "name": "开黑车队 标准席位",
       "price": 0,
-      "description": "128积分 · 稳定车队 畅快开黑",
+      "description": "稳定车队 畅快开黑",
       "image": "/uploads/1783928561299-2b986612.jpg",
       "is_available": 1
     },
@@ -53,7 +53,7 @@
       "category_id": 1,
       "name": "开黑车队 高级席位",
       "price": 0,
-      "description": "198积分 · 高级车队 专业带飞",
+      "description": "高级车队 专业带飞",
       "image": "/uploads/1783928567085-17ff7d62.jpg",
       "is_available": 1
     },
@@ -62,7 +62,7 @@
       "category_id": 1,
       "name": "开黑车队 精英席位",
       "price": 0,
-      "description": "258积分 · 精英车队 碾压对局",
+      "description": "精英车队 碾压对局",
       "image": "/uploads/1783928573436-9bc13e02.jpg",
       "is_available": 1
     },
@@ -71,7 +71,7 @@
       "category_id": 1,
       "name": "开黑车队 大师席位",
       "price": 0,
-      "description": "378积分 · 大师车队 胜率保障",
+      "description": "大师车队 胜率保障",
       "image": "/uploads/1783928580199-22bfdd52.jpg",
       "is_available": 1
     },
@@ -80,7 +80,7 @@
       "category_id": 1,
       "name": "开黑车队 传说席位",
       "price": 0,
-      "description": "520积分 · 传说车队 巅峰对决",
+      "description": "传说车队 巅峰对决",
       "image": "/uploads/1783928586103-d1b4375f.jpg",
       "is_available": 1
     },
@@ -89,7 +89,7 @@
       "category_id": 1,
       "name": "开黑车队 巅峰席位",
       "price": 0,
-      "description": "688积分 · 巅峰车队 顶级体验",
+      "description": "巅峰车队 顶级体验",
       "image": "/uploads/1783928592951-f6f82e5d.jpg",
       "is_available": 1
     },
@@ -98,7 +98,7 @@
       "category_id": 1,
       "name": "开黑车队 至尊席A",
       "price": 0,
-      "description": "98积分 · VIP组队 贴心服务",
+      "description": "VIP组队 贴心服务",
       "image": "/uploads/1783928927017-ee01eb3e.jpg",
       "is_available": 1
     },
@@ -107,7 +107,7 @@
       "category_id": 1,
       "name": "开黑车队 至尊席B",
       "price": 0,
-      "description": "158积分 · 尊享组队 极致体验",
+      "description": "尊享组队 极致体验",
       "image": "/uploads/1783928956492-ee84e52e.jpg",
       "is_available": 1
     },
@@ -116,7 +116,7 @@
       "category_id": 1,
       "name": "开黑车队 至尊席C",
       "price": 0,
-      "description": "259积分 · 至尊组队 王者待遇",
+      "description": "至尊组队 王者待遇",
       "image": "/uploads/1783928962300-4906b712.jpg",
       "is_available": 1
     },
@@ -125,7 +125,7 @@
       "category_id": 2,
       "name": "开黑车队 娱乐席",
       "price": 0,
-      "description": "58积分/时 · 轻松娱乐 开心组队",
+      "description": "轻松娱乐 开心组队",
       "image": "/uploads/1783929550433-8a0146d7.jpg",
       "is_available": 1
     },
@@ -134,7 +134,7 @@
       "category_id": 2,
       "name": "开黑车队 技术席",
       "price": 0,
-      "description": "68积分/时 · 技术带飞 上分无忧",
+      "description": "技术带飞 上分无忧",
       "image": "/uploads/1783929574051-4155ae58.jpg",
       "is_available": 1
     },
@@ -143,7 +143,7 @@
       "category_id": 2,
       "name": "开黑车队 互助席",
       "price": 0,
-      "description": "48积分/时 · 互助开黑 快乐游戏",
+      "description": "互助开黑 快乐游戏",
       "image": "/uploads/1783929588052-7d52d881.jpg",
       "is_available": 1
     }
