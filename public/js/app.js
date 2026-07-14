@@ -40,6 +40,11 @@ var pageHistory = [];
       showCart();
     }
   };
+function startKeepAlive() {
+  setInterval(function() {
+    fetch('/api/ping').catch(function(){});
+  }, 120000);
+}
 })();
 
 // ======================== 页面导航 ========================

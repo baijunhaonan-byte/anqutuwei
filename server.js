@@ -648,7 +648,10 @@ if (u.pathname === "/api/users" && method === "GET") {
       return json(d.settings);
     } catch(e) { return json({ error: e.message }, 500); }
   }
-json({ error: "接口未找到" }, 404);
+  if (u.pathname === "/api/ping" && method === "GET") {
+    return json({ pong: true, time: Date.now() });
+  }
+  json({ error: "接口未找到" }, 404);
   } catch (err) {
     console.error("API 错误:", err);
     json({ error: err.message }, 500);

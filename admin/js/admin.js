@@ -769,7 +769,15 @@ async function loadSettings() {
     body += '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'login-bg-file-input\').click()">上传图片</button>';
     body += '<button class="btn btn-sm btn-default" onclick="clearLoginBg()" style="margin-left:4px;">清除</button>';
     body += '</div></div></div>';
-    body += '<input type="hidden" id="set-login-bg" value="' + escapeHtml(s.site_login_bg || '') + '">';
+      '<input type="hidden" id="set-login-bg" value="' + escapeHtml(s.site_login_bg || '') + '">';
+      body += '<div style="margin-bottom:14px;"><label style="display:block;font-size:13px;color:#666;margin-bottom:4px;">侧边栏背景图</label>' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div id="sidebar-bg-preview" style="width:80px;height:50px;border-radius:6px;overflow:hidden;border:1px solid #ddd;background:#f9f9f9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#999;">' + (s.site_sidebar_bg ? 'v' : '未设置') + '</div>' +
+        '<div><input type="file" id="sidebar-bg-file-input" accept="image/*" style="display:none;" onchange="uploadSidebarBg()">' +
+        '<button class="btn btn-sm btn-primary" onclick="document.getElementById(\'sidebar-bg-file-input\').click()">上传图片</button>' +
+        '<button class="btn btn-sm btn-default" onclick="clearSidebarBg()" style="margin-left:4px;">清除</button>' +
+        '</div></div></div>' + '\n' +
+      '<input type="hidden" id="set-sidebar-bg" value="' + escapeHtml(s.site_sidebar_bg || '') + '">';
 
     // 静态密钥（仅超级管理员可见）
     if (adminRole === "super_admin") {
