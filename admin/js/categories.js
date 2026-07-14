@@ -62,7 +62,7 @@ async function uploadCatImage() {
   var fd = new FormData();
   fd.append('image', file);
   try {
-    var r = await fetch('/api/upload', { method: 'POST', body: fd });
+    var r = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (window.adminToken || '') }, body: fd });
     if (r.ok) {
       var d = await r.json();
       document.getElementById('edit-cat-image').value = d.url;
@@ -87,8 +87,8 @@ async function saveEditCategory() {
   errEl.classList.add('hidden');
   try {
     var r = await fetch('/api/categories/' + editingCategoryId, {
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window.adminToken || '') },
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, image: image })
     });
     if (r.ok) {
