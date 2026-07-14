@@ -41,7 +41,36 @@ function checkRateLimit(ip, maxTimes, windowMs) {
   if (rateLimitStore[ip].count > maxTimes) return { ok: false, remaining: 0 };
   return { ok: true, remaining: maxTimes - rateLimitStore[ip].count };
 }
-const sessions = {};
+
+var sessions = {};
+loadSessions();
+
+function loadSessions() {
+  try {
+    var d = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "data.json"), "utf8"));
+    if (d._sessions) {
+      var now = Date.now();
+      Object.keys(d._sessions).forEach(function(k) {
+        if (d._sessions[k].expires > now) sessions[k] = d._sessions[k];
+      });
+    }
+  } catch(e) {}
+}
+
+function saveSessions() {
+  try {
+    if (db.clearJSONCache) db.clearJSONCache();
+    var dataPath = path.join(DATA_DIR, "data.json");
+    var d = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+    var now = Date.now();
+    var clean = {};
+    Object.keys(sessions).forEach(function(k) {
+      if (sessions[k].expires > now) clean[k] = sessions[k];
+    });
+    d._sessions = clean;
+    fs.writeFileSync(dataPath, JSON.stringify(d, null, 2), "utf8");
+  } catch(e) { console.error("保存sessions失败:", e.message); }
+}
 
 // ================== Auth helper ==================
 function getAuthUser(req) {
@@ -431,7 +460,8 @@ async function handleAPI(req, res) {
     var user = db.createUser(body.username, body.password, body.email || "", "customer");
     if (!user) return json({ error: "用户名已存在" }, 409);
     var token = crypto.randomBytes(32).toString("hex");
-    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
+    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 604800000 };
+    saveSessions();
     return json({ token: token, user: user }, 201);
   }
 
@@ -463,7 +493,8 @@ async function handleAPI(req, res) {
     }
 
     var token = crypto.randomBytes(32).toString("hex");
-    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
+    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 604800000 };
+    saveSessions();
     return json({ token: token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
   }
 
@@ -483,7 +514,8 @@ async function handleAPI(req, res) {
     var clientIp = getClientIP(req);
     db.updateUserLastIP(user.id, clientIp);
     var token = crypto.randomBytes(32).toString("hex");
-    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 86400000 };
+    sessions[token] = { userId: user.id, role: user.role, expires: Date.now() + 604800000 };
+    saveSessions();
     return json({ token: token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
   }
 // ================== 退出 ==================
