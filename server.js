@@ -1,4 +1,4 @@
-﻿const http = require("http");
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -199,7 +199,8 @@ async function handleAPI(req, res) {
       res.write("data: connected\n\n");
       const client = { id: Date.now(), res };
       sseClients.push(client);
-      req.on("close", () => {
+      const sseTimer = setInterval(() => { try { res.write("event: ping\ndata: {}\n\n"); } catch(e) { clearInterval(sseTimer); } }, 30000);
+      req.on("close", () => { clearInterval(sseTimer);
         const idx = sseClients.indexOf(client);
         if (idx >= 0) sseClients.splice(idx, 1);
       });
