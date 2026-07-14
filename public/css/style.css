@@ -607,23 +607,51 @@ body {
   transform: translateY(-2px);
 }
 
+
+
 /* ===================== 响应式切换 ===================== */
-.mobile-view .hero-cat-card { width: 80px; height: 80px; font-size: 22px; }
-.mobile-view .hero-grid { gap: 10px; }
 .mobile-view #sidebar { width: 130px; }
-.mobile-view #main-content { padding: 10px; }
-.mobile-view .menu-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-.mobile-view .menu-item { padding: 10px; }
-.mobile-view .menu-item img { height: 100px; }
-.mobile-view .logo-text { font-size: 14px; }
-.mobile-view .logo-icon { font-size: 24px; }
-.mobile-view .page-header h2 { font-size: 16px; }
-.mobile-view #detail-content { max-width: 100%; padding: 10px; }
-.mobile-view #chat-content { max-width: 100%; }
-.mobile-view .modal-box { width: 95%; max-width: 350px; }
+.mobile-view #sidebar .logo-text { font-size: 12px; }
+.mobile-view #sidebar .logo-icon { font-size: 20px; }
+.mobile-view .nav-item { font-size: 12px; padding: 8px 10px; }
+.mobile-view #main-content { padding: 8px; margin-left: 130px; }
+.mobile-view .hero-grid { gap: 8px; }
+.mobile-view .hero-cat-card { width: 80px; height: 80px; font-size: 24px; }
+.mobile-view .hero-cat-card span:last-child { font-size: 10px; }
+.mobile-view .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.mobile-view .menu-item { padding: 6px; }
+.mobile-view .menu-item img { height: 70px; }
+.mobile-view .menu-item .name { font-size: 12px; }
+.mobile-view .menu-item .price { font-size: 11px; }
+.mobile-view #detail-content { max-width: 100%; padding: 8px; }
+.mobile-view .modal-box { width: 90%; max-width: 320px; }
+.mobile-view .page-header h2 { font-size: 15px; }
 @media (max-width: 480px) {
-  #sidebar { width: 60px; }
-  .logo-text { display: none; }
+  #sidebar { width: 100px; }
+  #sidebar .logo-text { font-size: 11px; }
+  .nav-item { font-size: 11px; padding: 6px 8px; }
+  #main-content { margin-left: 100px; padding: 6px; }
+  .hero-grid { gap: 6px; }
   .hero-cat-card { width: 70px; height: 70px; font-size: 20px; }
-  .menu-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .menu-item img { height: 60px; }
+  .modal-box { width: 95%; max-width: 300px; }
+}
+
+.mobile-view #video-bg, .mobile-view #video-bg video {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  z-index: -2 !important;
+}
+/* 强制手机端视频覆盖全屏 */
+@media (max-width: 768px) {
+  #video-bg { position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -2; }
+  #video-bg video { min-width: 100%; min-height: 100%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); object-fit: cover; }
+  #video-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
 }

@@ -863,3 +863,29 @@ function toggleMusic() {
   // 阻止锁屏时body滚动
   document.body.style.overflow = "hidden";
 })();
+
+// ======================== 视图切换 ========================
+function toggleView() {
+  var app = document.getElementById("app");
+  var btn = document.getElementById("view-toggle");
+  if (!app || !btn) return;
+  if (app.classList.contains("mobile-view")) {
+    app.classList.remove("mobile-view");
+    btn.textContent = "📱 手机模式";
+    localStorage.setItem("peiwang_view", "desktop");
+  } else {
+    app.classList.add("mobile-view");
+    btn.textContent = "💻 电脑模式";
+    localStorage.setItem("peiwang_view", "mobile");
+  }
+}
+// 恢复上次选择的模式
+(function() {
+  var saved = localStorage.getItem("peiwang_view");
+  if (saved === "mobile") {
+    var app = document.getElementById("app");
+    if (app) app.classList.add("mobile-view");
+    var btn = document.getElementById("view-toggle");
+    if (btn) btn.textContent = "💻 电脑模式";
+  }
+})();
