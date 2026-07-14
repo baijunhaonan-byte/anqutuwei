@@ -1,4 +1,4 @@
-var adminToken = localStorage.getItem("peiwang_admin_token") || null;
+﻿var adminToken = localStorage.getItem("peiwang_admin_token") || null;
 
 (async function checkAdminLogin() {
   if (adminToken) {
@@ -184,7 +184,7 @@ function closeModal() {
   document.getElementById("modal-overlay").classList.add("hidden");
 }
 
-// ======================== 订单管理 ========================
+// ======================== 咨询管理 ========================
 async function loadOrders() {
   var filter = document.getElementById("order-filter").value;
   var url = "/api/orders";
@@ -196,7 +196,7 @@ async function loadOrders() {
 function renderOrders() {
   var container = document.getElementById("order-table-container");
   if (!currentOrders || currentOrders.length === 0) {
-    container.innerHTML = "<div class='empty-state'>" + "暂无订单" + "</div>";
+    container.innerHTML = "<div class='empty-state'>" + "暂无咨询" + "</div>";
     return;
   }
   var total = currentOrders.length;
@@ -204,7 +204,7 @@ function renderOrders() {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentOrders.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>菜品</th><th>客户</th><th>联系</th><th>数量</th><th>金额</th><th>状态</th><th>备注</th><th>操作</th>";
+  html += "<th>#</th><th>菜品</th><th>客户</th><th>联系</th><th>数量</th><th>积分</th><th>状态</th><th>备注</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var o = pageData[i];
@@ -243,29 +243,29 @@ function statusLabel(s) {
 }
 
 async function confirmOrder(id) {
-  if (!confirm("确认此订单？")) return;
+  if (!confirm("确认此咨询？")) return;
   var o = await apiPut("/api/orders/" + id + "/status", { status: "confirmed" });
-  notify("订单 #" + id + " 已确认，已添加到消费记录");
+  notify("咨询 #" + id + " 已确认，已添加到咨询记录");
   loadOrders();
 }
 
 async function cancelOrder(id) {
-  if (!confirm("取消此订单？")) return;
+  if (!confirm("取消此咨询？")) return;
   await apiPut("/api/orders/" + id + "/status", { status: "cancelled" });
-  notify("订单 #" + id + " 已取消");
+  notify("咨询 #" + id + " 已取消");
   loadOrders();
 }
 
 async function completeOrder(id) {
   await apiPut("/api/orders/" + id + "/status", { status: "completed" });
-  notify("订单 #" + id + " 已完成");
+  notify("咨询 #" + id + " 已完成");
   loadOrders();
 }
 
 async function deleteOrder(id) {
-  if (!confirm("确定删除订单 #" + id + "？")) return;
+  if (!confirm("确定删除咨询 #" + id + "？")) return;
   await apiDelete("/api/orders/" + id);
-  notify("订单 #" + id + " 已删除");
+  notify("咨询 #" + id + " 已删除");
   loadOrders();
 }
 
@@ -291,7 +291,7 @@ function renderMenuItems(cats) {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentMenuItems.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>图片</th><th>名称</th><th>分类</th><th>价格</th><th>描述</th><th>状态</th><th>操作</th>";
+  html += "<th>#</th><th>图片</th><th>名称</th><th>分类</th><th>积分</th><th>描述</th><th>状态</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var it = pageData[i];
@@ -345,7 +345,7 @@ async function showAddEditForm(id) {
   var body = "";
   body += "<label><span>分类</span><select id='mi-category'>" + catOptions + "</select></label>";
   body += "<label><span>名称</span><input id='mi-name' value='" + (item ? escapeHtml(item.name) : "") + "'></label>";
-  body += "<label><span>价格</span><input id='mi-price' type='number' step='0.01' value='" + (item ? item.price : "") + "'></label>";
+  body += "<label><span>积分</span><input id='mi-price' type='number' step='0.01' value='" + (item ? item.price : "") + "'></label>";
   body += "<label><span>描述</span><textarea id='mi-desc'>" + (item ? escapeHtml(item.description || "") : "") + "</textarea></label>";
   body += "<div style='margin-bottom:14px;'><label style='display:block;font-size:13px;color:#666;margin-bottom:4px;'>项目图片</label>" +
     "<div style='display:flex;align-items:center;gap:10px;'>" +
@@ -436,7 +436,7 @@ async function loadChatList() {
   for (var i = 0; i < chatOrders.length; i++) {
     var o = chatOrders[i];
     html += "<div class='chat-order-card' onclick='showAdminChat(" + o.id + ")'>";
-    html += "<h4>订单 #" + o.id + " - " + escapeHtml(o.menu_name || "未知") + "</h4>";
+    html += "<h4>咨询 #" + o.id + " - " + escapeHtml(o.menu_name || "未知") + "</h4>";
     html += "<p>客户: " + escapeHtml(o.customer_name) + " | " + escapeHtml(o.customer_contact || "无联系方式") + "</p>";
     html += "<p>金额: ¥" + o.total_price + " | 状态: <span class='status-badge status-" + o.status + "'>" + statusLabel(o.status) + "</span></p>";
     html += "</div>";
@@ -464,7 +464,7 @@ async function showAdminChat(orderId) {
     }
   }
 
-  var title = "客服聊天 - 订单 #" + orderId;
+  var title = "客服聊天 - 咨询 #" + orderId;
   if (orderInfo) title += " " + orderInfo.menu_name;
 
   var body = "<div class='chat-box'>";
@@ -544,7 +544,7 @@ async function adminSendChat() {
   }
 }
 
-// ======================== 消费记录 ========================
+// ======================== 咨询记录 ========================
 async function loadConsumption() {
   currentConsumption = await apiGet("/api/consumption");
   renderConsumption();
@@ -553,7 +553,7 @@ async function loadConsumption() {
 function renderConsumption() {
   var container = document.getElementById("consumption-table-container");
   if (!currentConsumption || currentConsumption.length === 0) {
-    container.innerHTML = "<div class='empty-state'>" + "暂无消费记录" + "</div>";
+    container.innerHTML = "<div class='empty-state'>" + "暂无咨询记录" + "</div>";
     return;
   }
   var total = currentConsumption.length;
@@ -561,7 +561,7 @@ function renderConsumption() {
   var end = Math.min(start + PAGE_SIZE, total);
   var pageData = currentConsumption.slice(start, end);
   var html = "<div class='table-container'><table><thead><tr>";
-  html += "<th>#</th><th>订单号</th><th>客户</th><th>服务</th><th>数量</th><th>金额</th><th>确认时间</th><th>操作</th>";
+  html += "<th>#</th><th>咨询号</th><th>客户</th><th>服务</th><th>数量</th><th>积分</th><th>确认时间</th><th>操作</th>";
   html += "</tr></thead><tbody>";
   for (var i = 0; i < pageData.length; i++) {
     var r = pageData[i];
@@ -586,7 +586,7 @@ function renderConsumption() {
 function goConsumptionPage(p) { consumptionPage = p; renderConsumption(); }function goConsumptionPage(p) { consumptionPage = p; renderConsumption(); }
 
 
-// ======================== 消费记录增删改 ========================
+// ======================== 咨询记录增删改 ========================
 var editingConsumptionId = null;
 
 function showAddConsumption() {
@@ -595,10 +595,10 @@ function showAddConsumption() {
   body += "<label><span>客户名称</span><input id='cr-customer' value=''></label>";
   body += "<label><span>服务项目</span><input id='cr-service' value=''></label>";
   body += "<label><span>数量</span><input id='cr-qty' type='number' value='1'></label>";
-  body += "<label><span>金额</span><input id='cr-price' type='number' step='0.01' value='0'></label>";
+  body += "<label><span>积分</span><input id='cr-price' type='number' step='0.01' value='0'></label>";
   body += "<button class='btn btn-primary' onclick='saveConsumption()'>保存</button>";
   body += "<button class='btn btn-default' onclick='closeModal()'>取消</button>";
-  showModal("新增消费记录", body);
+  showModal("新增咨询记录", body);
 }
 
 function editConsumption(id) {
@@ -612,10 +612,10 @@ function editConsumption(id) {
   body += "<label><span>客户名称</span><input id='cr-customer' value='" + escapeHtml(r.customer_name) + "'></label>";
   body += "<label><span>服务项目</span><input id='cr-service' value='" + escapeHtml(r.menu_item_name) + "'></label>";
   body += "<label><span>数量</span><input id='cr-qty' type='number' value='" + r.quantity + "'></label>";
-  body += "<label><span>金额</span><input id='cr-price' type='number' step='0.01' value='" + r.total_price + "'></label>";
+  body += "<label><span>积分</span><input id='cr-price' type='number' step='0.01' value='" + r.total_price + "'></label>";
   body += "<button class='btn btn-primary' onclick='saveConsumption()'>保存</button>";
   body += "<button class='btn btn-default' onclick='closeModal()'>取消</button>";
-  showModal("编辑消费记录 #" + id, body);
+  showModal("编辑咨询记录 #" + id, body);
 }
 
 async function saveConsumption() {
@@ -667,7 +667,7 @@ function notify(msg) {
   var evtSource = new EventSource("/api/events");
   evtSource.addEventListener("new_order", function(e) {
     var data = JSON.parse(e.data);
-    notify("新订单 #" + data.id + " 来自 " + (data.customer_name || "游客"));
+    notify("新咨询 #" + data.id + " 来自 " + (data.customer_name || "游客"));
     if (document.getElementById("tab-orders").classList.contains("active")) loadOrders();
     if (document.getElementById("tab-chat").classList.contains("active")) loadChatList();
   });

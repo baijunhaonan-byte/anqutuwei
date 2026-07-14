@@ -1,4 +1,4 @@
-// ======================== 全局变量 ========================
+﻿// ======================== 全局变量 ========================
 var categories = [];
 var currentCategoryId = null;
 var orders = [];
@@ -179,7 +179,7 @@ function renderMenuGrid(items) {
 
     var price = document.createElement("div");
     price.className = "price";
-    price.textContent = "¥" + it.price;
+    price.textContent = "积分" + it.price;
     body.appendChild(price);
 
     var desc = document.createElement("div");
@@ -210,7 +210,7 @@ async function showDetail(itemId) {
 
   var price = document.createElement("div");
   price.className = "price";
-  price.textContent = "¥" + it.price;
+  price.textContent = "积分" + it.price;
   el.appendChild(price);
 
   var desc = document.createElement("p");
@@ -296,7 +296,7 @@ async function submitOrder(itemId, price) {
       remark: remark
     });
 
-    notify("下单成功！订单 #" + order.id + "，金额 ¥" + (price * qty));
+    notify("提交成功！咨询 #" + order.id + "，金额" + (price * qty));
 
     // 发送一条聊天消息给客服
     await sendChatMessage(order.id, "customer", "你好，我下单了" + (order.menu_name || "菜品") + "，请确认！");
@@ -315,7 +315,7 @@ async function showCart() {
   el.innerHTML = "";
 
   if (!orders || orders.length === 0) {
-    el.innerHTML = "<div style='text-align:center;padding:40px;color:#999;'>暂无订单</div>";
+    el.innerHTML = "<div style='text-align:center;padding:40px;color:#999;'>暂无咨询</div>";
     showPage("page-cart");
     return;
   }
@@ -330,7 +330,7 @@ async function showCart() {
     card.appendChild(h4);
 
     var p1 = document.createElement("p");
-    p1.textContent = "订单 #" + o.id + " | ¥" + o.total_price + " | " + o.customer_name;
+    p1.textContent = "订单 #" + o.id + " | 积分" + o.total_price + " | " + o.customer_name;
     card.appendChild(p1);
 
     var statusSpan = document.createElement("span");

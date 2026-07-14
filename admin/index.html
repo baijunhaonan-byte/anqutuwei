@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>陪玩店 - 管理后台</title>
+  <title>甜粥 - 管理后台</title>
   <link rel="stylesheet" href="/admin/css/admin.css">
 </head>
 <body>
@@ -33,10 +33,10 @@
           <span class="admin-logout-link" onclick="adminLogout()">退出</span>
         </div>
         <nav class="admin-nav">
-          <div class="nav-item active" data-tab="orders" onclick="switchTab('orders')">订单管理</div>
+          <div class="nav-item active" data-tab="orders" onclick="switchTab('orders')">咨询管理</div>
           <div class="nav-item" data-tab="menu" onclick="switchTab('menu')">项目管理</div>
           <div class="nav-item" data-tab="chat" onclick="switchTab('chat')">客服聊天</div>
-          <div class="nav-item" data-tab="consumption" onclick="switchTab('consumption')">消费记录</div>
+          <div class="nav-item" data-tab="consumption" onclick="switchTab('consumption')">咨询记录</div>
           <div class="nav-item" data-tab="categories" onclick="switchTab('categories')">分类管理</div>
           <div class="nav-item" data-tab="users" onclick="switchTab('users')">用户管理</div>
           <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">网站设置</div>
@@ -49,10 +49,10 @@
       <main id="admin-main">
         <div id="tab-orders" class="admin-tab active">
           <div class="tab-header">
-            <h2>订单管理</h2>
+            <h2>咨询管理</h2>
             <div class="tab-actions">
               <select id="order-filter" onchange="loadOrders()">
-                <option value="">全部订单</option>
+                <option value="">全部咨询</option>
                 <option value="pending">待确认</option>
                 <option value="confirmed">已确认</option>
                 <option value="completed">已完成</option>
@@ -88,7 +88,7 @@
 
         <div id="tab-consumption" class="admin-tab">
           <div class="tab-header">
-            <h2>消费记录</h2>
+            <h2>咨询记录</h2>
             <button onclick="showAddConsumption()" class="btn btn-primary">+ 新增记录</button>
           </div>
           <div id="consumption-table-container"></div>
