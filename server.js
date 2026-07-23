@@ -277,10 +277,10 @@ async function handleAPI(req, res) {
         return json({ error: "请选择菜品" }, 400);
       }
       var au2 = getAuthUser(req);
-      if (!au2) return json({ error: "请先登录后再提交" }, 401);
+      if (!au2) return json({ error: "请先登录后再下单" }, 401);
       var uid = au2.id;
       const order = db.createOrder(
-        body.menu_item_id, body.customer_name,
+        body.menu_item_id, body.customer_name || au2.username,
         body.customer_contact, body.quantity, body.remark, uid
       );
       if (!order) return json({ error: "菜品不存在" }, 404);
@@ -639,7 +639,7 @@ server.listen(PORT, () => {
   
 // Migration: admin username
 console.log("==============================");
-  console.log("  社区服务 已启动");
+  console.log("  陪玩店 已启动");
   
 // Migration: admin username
 console.log("==============================");
