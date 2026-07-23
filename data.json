@@ -2,140 +2,185 @@
   "categories": [
     {
       "id": 1,
-      "name": "我的战绩",
-      "icon": "🏆",
+      "name": "护航",
+      "icon": "🛡️",
       "sort_order": 1,
       "image": "/uploads/1783855677513-b849e44d.webp"
     },
     {
       "id": 2,
-      "name": "游戏心得",
-      "icon": "📝",
+      "name": "陪玩",
+      "icon": "🎃",
       "sort_order": 2,
       "image": "/uploads/1783855690438-668bf25c.webp"
     },
     {
       "id": 3,
-      "name": "精彩时刻",
-      "icon": "🎉",
+      "name": "趣味单",
+      "icon": "🎆",
       "sort_order": 3,
       "image": "/uploads/1783855700294-2ea4ff52.jpg"
     },
     {
       "id": 4,
-      "name": "成长记录",
-      "icon": "📈",
+      "name": "代肝",
+      "icon": "💎",
       "sort_order": 4,
       "image": "/uploads/1783855731546-75ce092f.jpg"
     }
   ],
   "menu_items": [
     {
-      "id": 1,
+      "id": 6,
       "category_id": 1,
-      "name": "暗区突围 全装通关",
-      "price": 0,
-      "description": "记录我第一次暗区全装通关",
+      "name": "暗区无限护航",
+      "price": 68,
+      "description": "68保988W",
       "image": "/uploads/1783928553289-da97c46a.jpg",
       "is_available": 1
     },
     {
-      "id": 2,
+      "id": 7,
       "category_id": 1,
-      "name": "三图连破 个人最佳",
-      "price": 0,
-      "description": "三张地图连续突破的个人记录",
+      "name": "暗区无限护航",
+      "price": 128,
+      "description": "128保1858W",
       "image": "/uploads/1783928561299-2b986612.jpg",
       "is_available": 1
     },
     {
-      "id": 3,
+      "id": 8,
       "category_id": 1,
-      "name": "赛季最高胜率",
-      "price": 0,
-      "description": "这个赛季打出了最高胜率",
+      "name": "暗区无限护航",
+      "price": 198,
+      "description": "198保2888W",
       "image": "/uploads/1783928567085-17ff7d62.jpg",
       "is_available": 1
     },
     {
-      "id": 4,
+      "id": 9,
       "category_id": 1,
-      "name": "单排上传说",
-      "price": 0,
-      "description": "纯单排打上传说的心路历程",
+      "name": "暗区无限护航",
+      "price": 258,
+      "description": "258保3758W",
       "image": "/uploads/1783928573436-9bc13e02.jpg",
       "is_available": 1
     },
     {
-      "id": 5,
-      "category_id": 2,
-      "name": "新手避坑指南",
-      "price": 0,
-      "description": "给新手的一些实用建议",
+      "id": 10,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 378,
+      "description": "378保5488W",
       "image": "/uploads/1783928580199-22bfdd52.jpg",
       "is_available": 1
     },
     {
-      "id": 6,
-      "category_id": 2,
-      "name": "装备搭配心得",
-      "price": 0,
-      "description": "我常用的几套装备搭配",
+      "id": 11,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 520,
+      "description": "520保7500W以上",
       "image": "/uploads/1783928586103-d1b4375f.jpg",
       "is_available": 1
     },
     {
-      "id": 7,
-      "category_id": 2,
-      "name": "地图点位解析",
-      "price": 0,
-      "description": "各大地图关键点位分享",
+      "id": 12,
+      "category_id": 1,
+      "name": "暗区无限护航",
+      "price": 688,
+      "description": "688保1E以上",
       "image": "/uploads/1783928592951-f6f82e5d.jpg",
       "is_available": 1
     },
     {
-      "id": 8,
-      "category_id": 2,
-      "name": "团队配合技巧",
-      "price": 0,
-      "description": "开黑时的一些配合心得",
+      "id": 13,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 98,
+      "description": "98保1288W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
       "image": "/uploads/1783928927017-ee01eb3e.jpg",
       "is_available": 1
     },
     {
-      "id": 9,
-      "category_id": 3,
-      "name": "五杀精彩回放",
-      "price": 0,
-      "description": "昨晚打出的五杀操作",
+      "id": 14,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 158,
+      "description": "158保2088W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
       "image": "/uploads/1783928956492-ee84e52e.jpg",
       "is_available": 1
     },
     {
-      "id": 10,
-      "category_id": 3,
-      "name": "残局1v3翻盘",
-      "price": 0,
-      "description": "绝境翻盘的精彩瞬间",
+      "id": 15,
+      "category_id": 1,
+      "name": "皇帝单(至尊服务)",
+      "price": 258,
+      "description": "258保3588W；两猛男护十情绪女陪 让老板不再枯燥等待(女陪技术在线可带熟图)",
       "image": "/uploads/1783928962300-4906b712.jpg",
       "is_available": 1
     },
     {
-      "id": 11,
-      "category_id": 4,
-      "name": "从青铜到传说",
-      "price": 0,
-      "description": "记录我的上分历程",
+      "id": 16,
+      "category_id": 2,
+      "name": "娱乐女陪",
+      "price": 58,
+      "description": "58/1H",
       "image": "/uploads/1783929550433-8a0146d7.jpg",
       "is_available": 1
     },
     {
-      "id": 12,
-      "category_id": 4,
-      "name": "本月游戏时长",
-      "price": 0,
-      "description": "本月游戏数据总结",
+      "id": 17,
+      "category_id": 2,
+      "name": "技术女陪",
+      "price": 68,
+      "description": "68/1H；技术女陪情绪价值技术双在线可带熟图",
       "image": "/uploads/1783929574051-4155ae58.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 18,
+      "category_id": 2,
+      "name": "技术男陪",
+      "price": 48,
+      "description": "48/1H；陪陪出金打人装备都归老板哦～",
+      "image": "/uploads/1783929588052-7d52d881.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 19,
+      "category_id": 4,
+      "name": "3*3套餐一",
+      "price": 358,
+      "description": "60个任务包磨损+加急（1-3天完成，一般为2天内）",
+      "image": "/uploads/1783929772889-3cd50ece.jpg",
+      "is_available": 1
+    },
+    {
+      "id": 20,
+      "category_id": 4,
+      "name": "3*3套餐二",
+      "price": 308,
+      "description": "60个任务包磨损（3-5天内完成）",
+      "image": "/uploads/1783929790271-224ab252.webp",
+      "is_available": 1
+    },
+    {
+      "id": 21,
+      "category_id": 4,
+      "name": "3*3套餐三",
+      "price": 318,
+      "description": "6个任务不包磨损+加急（1-3天内完成）",
+      "image": "/uploads/1783929802415-7a99094f.webp",
+      "is_available": 1
+    },
+    {
+      "id": 22,
+      "category_id": 4,
+      "name": "3*3套餐四",
+      "price": 288,
+      "description": "60个任务不包磨损（3-5天内完成）",
+      "image": "/uploads/1783929810341-7073e5df.jpg",
       "is_available": 1
     }
   ],
@@ -144,10 +189,10 @@
   "consumption_records": [],
   "_nextId": {
     "category": 5,
-    "menu": 15,
-    "order": 1,
+    "menu": 6,
+    "order": 29,
     "chat": 63,
-    "consumption": 1,
+    "consumption": 15,
     "user": 5
   },
   "users": [
@@ -185,6 +230,7 @@
     "site_logo_url": "/uploads/1783855498637-a990ca77.png",
     "site_video_url": "/tupian/anqu.mp4",
     "site_login_bg": "/uploads/1783868386168-43b2faae.webp",
-    "site_sidebar_bg": "/uploads/1783912575455-1a0acc40.webp"
+    "site_sidebar_bg": "/uploads/1783912575455-1a0acc40.webp",
+    "site_music_url": ""
   }
 }
